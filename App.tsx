@@ -16,7 +16,7 @@ const App: React.FC = () => {
     setCurrentApp('base');
   };
 
-  const activeLabel = currentApp === 'base' ? '解决方案样板间' : currentApp === 'prompt' ? '提示词模板' : 'aPaaS 低代码';
+  const activeLabel = currentApp === 'base' ? '多维表格 Base' : currentApp === 'prompt' ? '提示词模板' : 'aPaaS 低代码';
 
   const apps: { id: AppId; name: string; icon: string }[] = [
     { id: 'apaas', name: 'aPaaS 低代码', icon: '⚡' },
@@ -36,27 +36,20 @@ const App: React.FC = () => {
             <span className="text-[10px] text-gray-400">售前 AI 方案演示工作台</span>
           </div>
 
-          <button
-            onClick={handleReset}
-            className={`ml-2 px-3 py-1 rounded text-[11px] font-bold border transition-colors ${selectedDemo ? 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50' : 'bg-blue-50 text-blue-600 border-blue-100'}`}
-          >
-            解决方案样板间
-          </button>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg p-0.5">
+          <nav className="flex items-center gap-3 ml-2">
             {apps.map(app => (
               <button
                 key={app.id}
                 onClick={() => setCurrentApp(app.id)}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all flex items-center gap-1.5 ${currentApp === app.id ? 'bg-white text-blue-600 shadow-sm border border-gray-200' : 'text-gray-500 hover:bg-white/70'}`}
+                className={`px-1 py-0.5 text-[11px] font-semibold border-b-2 transition-colors focus:outline-none ${currentApp === app.id ? 'text-blue-600 border-blue-600' : 'text-gray-500 border-transparent hover:text-gray-800 hover:border-gray-200'}`}
               >
-                <span className="text-[12px]">{app.icon}</span>
-                <span className="hidden md:inline">{app.name}</span>
+                {app.name}
               </button>
             ))}
-          </div>
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-4">
           {selectedDemo && (
             <button 
               onClick={handleReset}
@@ -105,9 +98,85 @@ const App: React.FC = () => {
                         复制指令
                       </button>
                     </div>
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 font-mono text-[11px] text-gray-600 leading-relaxed italic">
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 font-mono text-[11px] text-gray-600 leading-relaxed italic">
                       "{tmp.prompt}"
                     </div>
+
+                    <details className="mt-4 group">
+                      <summary className="cursor-pointer select-none text-xs font-bold text-gray-700 flex items-center gap-2">
+                        业务上下文
+                        <span className="text-[10px] font-semibold text-gray-400 group-open:hidden">展开</span>
+                        <span className="text-[10px] font-semibold text-gray-400 hidden group-open:inline">收起</span>
+                      </summary>
+                      <div className="mt-3 bg-white border border-gray-100 rounded-xl p-4 text-[11px] text-gray-600 space-y-3">
+                        <div className="space-y-1">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">场景</div>
+                          <div className="leading-relaxed">{tmp.scenario.background}</div>
+                          <div className="leading-relaxed"><span className="font-bold text-gray-700">目标：</span>{tmp.scenario.goal}</div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">输入 / 输出</div>
+                          <div className="flex flex-wrap gap-2">
+                            {tmp.scenario.inputs.map((it) => (
+                              <span key={`in-${it}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">{it}</span>
+                            ))}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {tmp.scenario.outputs.map((it) => (
+                              <span key={`out-${it}`} className="px-2 py-0.5 rounded-full border border-blue-100 bg-blue-50 text-[10px] font-semibold text-blue-700">{it}</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">MCP</div>
+                          <div className="space-y-2">
+                            {tmp.mcps.map((cap) => (
+                              <div key={cap.name} className="border border-gray-100 rounded-lg p-3 bg-gray-50/60">
+                                <div className="text-[11px] font-bold text-gray-700">{cap.name}</div>
+                                <div className="text-[10px] text-gray-500 mt-0.5">{cap.description}</div>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  {cap.tools.map((tool) => (
+                                    <span key={`${cap.name}-${tool.name}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-white text-[10px] font-semibold text-gray-600">
+                                      {tool.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Skills</div>
+                          <div className="flex flex-wrap gap-2">
+                            {tmp.skills.map((s) => (
+                              <span key={s} className="px-2 py-0.5 rounded-full border border-gray-200 bg-white text-[10px] font-semibold text-gray-600">{s}</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Agents</div>
+                          <div className="space-y-2">
+                            {tmp.agents.map((a) => (
+                              <div key={a.name} className="border border-gray-100 rounded-lg p-3">
+                                <div className="flex items-baseline justify-between gap-2">
+                                  <div className="text-[11px] font-bold text-gray-700">{a.name}</div>
+                                  <div className="text-[10px] font-semibold text-gray-400">{a.role}</div>
+                                </div>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  {a.responsibilities.map((r) => (
+                                    <span key={`${a.name}-${r}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">{r}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </details>
                   </div>
                 ))}
               </div>

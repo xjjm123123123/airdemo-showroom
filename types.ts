@@ -41,3 +41,40 @@ export interface BotCard {
   fields: { label: string; value: string }[];
   actions: { label: string; primary?: boolean }[];
 }
+
+export interface BusinessContextScenario {
+  background: string;
+  goal: string;
+  inputs: string[];
+  constraints: string[];
+  outputs: string[];
+}
+
+export interface McpTool {
+  name: string;
+  description: string;
+}
+
+export interface McpCapability {
+  name: string;
+  description: string;
+  tools: McpTool[];
+}
+
+export interface AgentProfile {
+  name: string;
+  role: string;
+  responsibilities: string[];
+}
+
+export interface BusinessContext {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  scenario: BusinessContextScenario;
+  mcps: McpCapability[];
+  skills: string[];
+  agents: AgentProfile[];
+  prompt: string;
+}
