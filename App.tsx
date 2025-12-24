@@ -218,7 +218,7 @@ const App: React.FC = () => {
                     </div>
                     
                     {/* Decorative Image */}
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 h-[120%] w-[50%] hidden lg:flex items-center justify-center pointer-events-none z-0 opacity-80 mix-blend-normal">
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 h-[120%] w-[50%] hidden lg:flex items-center justify-center pointer-events-none z-0 opacity-80 mix-blend-normal">
                       <img 
                         src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2000_09_48.png" 
                         alt="" 
