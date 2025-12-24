@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { BusinessContext, Demo } from '../types';
-import { PROMPT_TEMPLATES } from '../constants';
+import { EFFICIENCY_TOOLS, PROMPT_TEMPLATES } from '../constants';
 
-type AppId = 'apaas' | 'base' | 'prompt';
+type AppId = 'home' | 'demo' | 'efficiency' | 'prompt';
 type ViewId = 'main' | 'management' | 'equipment' | 'factory';
 type SecondaryViewId = Exclude<ViewId, 'main'>;
 type FieldType = 'text' | 'number' | 'select' | 'image';
@@ -13,6 +13,7 @@ type BaseViewMode = 'table' | 'app';
 interface WorkspaceProps {
   demo: Demo;
   currentApp: AppId;
+  initialView?: ViewId;
 }
 
 interface ColumnDef {
@@ -21,15 +22,14 @@ interface ColumnDef {
   type: FieldType;
 }
 
-const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp }) => {
+const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) => {
   const [isAiRunning, setIsAiRunning] = useState(false);
 
   const baseIframeUrl = 'https://bytedance.larkoffice.com/base/Rcbrbk2qCazsPTs48TecJSIKnod?from=from_copylink';
   const baseAppIframeUrl = 'https://bytedance.larkoffice.com/app/Vv6DbpDoGawcMwszp3XcMms6nTf';
   
   // UI State
-  const [isBottomBarOpen, setIsBottomBarOpen] = useState(false); 
-  const [currentView, setCurrentView] = useState<ViewId>('main');
+  const [currentView, setCurrentView] = useState<ViewId>(initialView || 'main');
   const [baseViewMode, setBaseViewMode] = useState<BaseViewMode>('table');
   
   // State for current active table and columns
@@ -64,10 +64,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp }) => {
   const getSecondaryData = (view: SecondaryViewId) => editableSecondaryDataByView[view] || [];
 
   useEffect(() => {
-    setIsBottomBarOpen(false);
     setShowAddColumn(false);
     setEditingCell(null);
-    if (currentApp !== 'base') setBaseViewMode('table');
+    if (currentApp !== 'demo') setBaseViewMode('table');
   }, [currentApp]);
 
   useEffect(() => {
@@ -75,6 +74,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp }) => {
     const base = demo.secondaryTable ? { management: demo.secondaryTable, equipment: demo.secondaryTable, factory: demo.secondaryTable } : {};
     setEditableSecondaryDataByView({ ...base, ...(demo.secondaryTables || {}) });
   }, [demo]);
+
+  useEffect(() => {
+    setCurrentView(initialView || 'main');
+  }, [demo, initialView]);
 
   useEffect(() => {
     setShowAddColumn(false);
@@ -498,23 +501,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp }) => {
   return (
     <div className="h-full w-full flex overflow-hidden bg-[#f5f6f7]">
       <section className="flex-1 flex flex-col min-w-0 bg-white relative">
-        <div className="h-10 border-b border-gray-200 flex items-center justify-between px-4 bg-white z-40 shadow-sm">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex items-center gap-1.5 text-xs font-medium min-w-0">
-              <span className="text-gray-400">Workspace</span>
-              <span className="text-gray-300">/</span>
-              <span className="text-gray-900 font-bold truncate">{currentApp === 'prompt' ? '提示词模板库' : currentApp === 'apaas' ? 'aPaaS 低代码' : demo.title}</span>
-            </div>
-          </div>
-          {currentApp === 'base' && (
-             <button onClick={() => setIsBottomBarOpen(!isBottomBarOpen)} className="text-[10px] font-black bg-gray-50 px-3 py-1 rounded hover:bg-gray-100 text-gray-500 transition-all border border-gray-200 uppercase tracking-tighter">
-                {isBottomBarOpen ? 'Close Views' : 'Views'}
-             </button>
-          )}
-        </div>
-
         <div className="flex-1 flex flex-col overflow-hidden bg-[#f5f6f7]">
-          {currentApp === 'base' ? (
+          {currentApp === 'demo' ? (
             <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn">
                <div className="h-10 bg-white border-b border-gray-100 flex items-center px-4 gap-4 flex-shrink-0 z-10">
                   <div className="ml-auto inline-flex rounded-xl border border-gray-200 bg-gray-50 p-0.5">
@@ -554,31 +542,76 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp }) => {
                   />
                 </div>
               )}
+            </div>
+          ) : currentApp === 'efficiency' ? (
+            <div className="flex-1 p-8 overflow-y-auto bg-gray-50 animate-fadeIn">
+              <div className="max-w-4xl mx-auto">
+                <header className="mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">效率工具</h2>
+                  <p className="text-sm text-gray-500">售前过程中的高频提效助手，一键打开即用。</p>
+                </header>
 
-               <div className={`transition-all duration-300 ease-in-out border-t border-gray-200 bg-white overflow-hidden ${isBottomBarOpen ? 'h-36' : 'h-0'}`}>
-                  <div className="p-4 flex gap-4 h-full overflow-x-auto no-scrollbar">
-                    {[
-                       { id: 'main', name: '人员违规数据表', icon: '📊', desc: '违规抓拍明细' },
-                       { id: 'management', name: '巡检管理数据表', icon: '📋', desc: '管理决策与整改跟进' },
-                       { id: 'equipment', name: '设备巡检数据表', icon: '⚙️', desc: '核心设备运行扫描' },
-                       { id: 'factory', name: '厂区巡检数据表', icon: '🏗️', desc: '公共区域与动力设施' }
-                    ].map(view => (
-                       <div key={view.id} onClick={() => { setCurrentView(view.id as ViewId); setIsBottomBarOpen(false); }} className={`flex-shrink-0 w-64 p-4 rounded-2xl border cursor-pointer transition-all flex items-center gap-4 ${currentView === view.id ? 'border-blue-500 bg-blue-50/50 shadow-md scale-[1.02]' : 'border-gray-100 hover:border-blue-200 bg-gray-50/50'}`}>
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shadow-inner ${currentView === view.id ? 'bg-blue-600 text-white shadow-blue-200' : 'bg-white text-gray-300'}`}>{view.icon}</div>
-                          <div className="flex flex-col">
-                             <span className={`text-xs font-bold ${currentView === view.id ? 'text-blue-700' : 'text-gray-700'}`}>{view.name}</span>
-                             <span className="text-[10px] text-gray-400 mt-1">{view.desc}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {EFFICIENCY_TOOLS.map((tool) => (
+                    <div key={tool.id} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase">{tool.name}</span>
+                            <h3 className="text-lg font-bold text-gray-800 truncate">{tool.title}</h3>
                           </div>
-                       </div>
-                    ))}
-                  </div>
-               </div>
+                          <a href={tool.url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-[11px] text-gray-500 hover:text-blue-600 truncate">
+                            {tool.url}
+                          </a>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <a
+                            href={tool.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all"
+                          >
+                            打开
+                          </a>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(tool.url);
+                              } catch {
+                              }
+                            }}
+                            className="px-4 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-50 transition-all"
+                          >
+                            复制链接
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="mt-5">
+                        <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">核心技能</div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {tool.skills.map((s) => (
+                            <span key={`${tool.id}-${s}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-5 bg-gray-50 rounded-xl p-4 border border-gray-100 text-[11px] text-gray-600 leading-relaxed italic">
+                        “{tool.highlight}”
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : currentApp === 'prompt' ? (
             <div className="flex-1 p-8 overflow-y-auto bg-gray-50 animate-fadeIn">
                <div className="max-w-4xl mx-auto">
                   <header className="mb-8">
-                     <h2 className="text-2xl font-bold text-gray-900 mb-2">提示词模板库</h2>
+                     <h2 className="text-2xl font-bold text-gray-900 mb-2">提示词模版库</h2>
                      <p className="text-sm text-gray-500">这些专业提示词定义了 Aily 分析巡检数据的深度逻辑。</p>
                   </header>
                   <div className="grid grid-cols-1 gap-6">
