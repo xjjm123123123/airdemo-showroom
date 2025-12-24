@@ -1,17 +1,39 @@
-
 import React, { useState } from 'react';
 import Catalog from './views/Catalog';
 import Workspace from './views/Workspace';
+import DemoFlow from './views/DemoFlow';
+import Efficiency from './views/Efficiency';
+import Prism from './components/Prism';
+import TextType from './components/TextType';
 import { Demo } from './types';
-import { DEMO_LIST, EFFICIENCY_TOOLS, PROMPT_TEMPLATES } from './constants';
+import { DEMO_LIST, EFFICIENCY_TOOLS } from './constants';
 
-type AppId = 'home' | 'demo' | 'efficiency' | 'prompt';
+type AppId = 'home' | 'demo' | 'efficiency';
 type WorkspaceViewId = 'main' | 'management' | 'equipment' | 'factory';
+
+// Icons
+const IconHome = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>;
+const IconGrid = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
+const IconZap = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>;
+const IconClock = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
+const IconArrowRight = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
+const IconArrowUpRight = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>;
+const IconMessage = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
+const IconSend = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>;
+const IconChevronDown = ({ className = '' }: { className?: string }) => (
+  <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+const AI_NAVIGATOR_URL = 'https://version3-ai-vi-1-0-1.vercel.app/';
 
 const App: React.FC = () => {
   const [selectedDemo, setSelectedDemo] = useState<Demo | null>(null);
   const [currentApp, setCurrentApp] = useState<AppId>('home');
   const [workspaceInitialView, setWorkspaceInitialView] = useState<WorkspaceViewId>('main');
+  const [demoViewMode, setDemoViewMode] = useState<'flow' | 'workspace'>('flow');
+  const [isHomeChatCollapsed, setIsHomeChatCollapsed] = useState(true);
   const [homeMessages, setHomeMessages] = useState<{ role: 'ai' | 'user'; text: string }[]>([
     { role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }
   ]);
@@ -26,21 +48,18 @@ const App: React.FC = () => {
     setSelectedDemo(null);
     setCurrentApp('demo');
     setWorkspaceInitialView('main');
+    setDemoViewMode('flow');
   };
 
   const inspectionDemo = DEMO_LIST.find((d) => d.id === 'inspection');
-  const tantan = EFFICIENCY_TOOLS.find((t) => t.id === 'tantan');
-  const ruirui = EFFICIENCY_TOOLS.find((t) => t.id === 'ruirui');
+  
+  const INSPECTION_COVER_URL =
+    'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%886.50.56.png';
+  const GTM_COVER_URL =
+    'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%883.35.20.png';
 
   const openEfficiencyTool = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
-  const openInspection = (view: WorkspaceViewId) => {
-    if (!inspectionDemo) return;
-    setWorkspaceInitialView(view);
-    setSelectedDemo(inspectionDemo);
-    setCurrentApp('demo');
   };
 
   const replyHomeAssistant = (text: string) => {
@@ -51,7 +70,7 @@ const App: React.FC = () => {
     if (t.includes('睿睿') || lower.includes('ruirui')) return '睿睿适合做汇报复盘：金句、干系人洞察、故事线与案例推荐。';
     if (t.includes('巡检') || t.includes('智能巡检') || lower.includes('inspection')) return '点击「AI 智能巡检」卡片即可进入演示。';
     if (t.includes('推荐') || t.includes('怎么选')) return '给我 3 个信息：行业 / 角色 / 痛点，我给你推荐路径。';
-    return '收到。也可以直接点上方「上线啦」卡片快速进入。';
+    return '收到。也可以直接点「最新 Demo / 最新效率工具」卡片快速进入。';
   };
 
   const sendHomeMessage = () => {
@@ -66,30 +85,44 @@ const App: React.FC = () => {
       ? '首页'
       : currentApp === 'demo'
         ? 'Demo中心'
-        : currentApp === 'efficiency'
-          ? '效率工具'
-          : '提示词模版';
+        : '效率工具';
 
-  const apps: { id: AppId; name: string; icon: string }[] = [
-    { id: 'home', name: '首页', icon: '🏠' },
-    { id: 'demo', name: 'Demo中心', icon: '📊' },
-    { id: 'efficiency', name: '效率工具', icon: '⚡' },
-    { id: 'prompt', name: '提示词模版', icon: '📝' }
+  const apps: { id: AppId; name: string; icon: React.ReactNode }[] = [
+    { id: 'home', name: '首页', icon: <IconHome /> },
+    { id: 'demo', name: 'Demo中心', icon: <IconGrid /> },
+    { id: 'efficiency', name: '效率工具', icon: <IconZap /> }
   ];
 
   return (
-    <div className="h-screen flex flex-col bg-[#f5f6f7] overflow-hidden">
-      <header className="h-10 border-b border-gray-200 flex items-center justify-between px-4 bg-white flex-shrink-0 z-50">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="w-6 h-6 feishu-blue rounded flex items-center justify-center cursor-pointer" onClick={handleGoHome}>
-            <span className="text-white font-bold text-sm">A</span>
-          </div>
-          <div className="flex flex-col leading-tight">
-            <h1 className="font-bold text-xs text-gray-800">AirDemo Showroom</h1>
-            <span className="text-[10px] text-gray-400">售前 AI 方案演示工作台</span>
+    <div className="h-screen flex flex-col bg-[color:var(--bg)] overflow-hidden font-sans relative">
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <Prism 
+          animationType="rotate" 
+          timeScale={0.5} 
+          height={3.5} 
+          baseWidth={5.5} 
+          scale={3.6} 
+          hueShift={0} 
+          colorFrequency={1} 
+          noise={0} 
+          glow={1} 
+        /> 
+      </div>
+      <header className="h-20 border-b border-[color:var(--border)] flex items-center justify-between px-6 lg:px-10 glass-panel flex-shrink-0 z-50 relative">
+        <div className="flex items-center gap-4 lg:gap-8 min-w-0 flex-1">
+          <div className="flex items-center gap-3 cursor-pointer group flex-shrink-0" onClick={handleGoHome}>
+            <img 
+              src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/Lark_Suite_logo_2022%201_%E5%89%AF%E6%9C%AC.png" 
+              alt="Logo" 
+              className="w-9 h-9 object-contain transition-transform group-hover:scale-105" 
+            />
+            <div className="flex flex-col leading-tight hidden sm:flex">
+              <h1 className="font-semibold text-sm text-[color:var(--text)] tracking-tight">AirDemo</h1>
+              <span className="text-[10px] font-medium text-[color:var(--text-3)] tracking-wide">Showroom</span>
+            </div>
           </div>
 
-          <nav className="flex items-center gap-3 ml-2">
+          <nav className="flex items-center gap-2 ml-4 lg:ml-8 overflow-x-auto no-scrollbar mask-gradient-r">
             {apps.map(app => (
               <button
                 key={app.id}
@@ -98,207 +131,262 @@ const App: React.FC = () => {
                     handleGoHome();
                     return;
                   }
+                  if (app.id === 'efficiency' && selectedDemo) {
+                     setDemoViewMode('workspace');
+                  }
+                  if (app.id === 'demo') {
+                    setSelectedDemo(null);
+                  }
                   setCurrentApp(app.id);
                 }}
-                className={`px-1 py-0.5 text-[11px] font-semibold border-b-2 transition-colors focus:outline-none ${currentApp === app.id ? 'text-blue-600 border-blue-600' : 'text-gray-500 border-transparent hover:text-gray-800 hover:border-gray-200'}`}
+                className={`ui-btn ui-btn-ghost px-3 lg:px-4 h-9 gap-2 text-xs lg:text-sm whitespace-nowrap flex-shrink-0 ${currentApp === app.id ? 'bg-[color:var(--bg-subtle)] text-[color:var(--text)] font-medium border border-[color:var(--border)]' : 'text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)]'}`}
               >
+                {app.icon}
                 {app.name}
               </button>
             ))}
+
+            <a
+              href={AI_NAVIGATOR_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="ui-btn ui-btn-ghost px-3 lg:px-4 h-9 gap-2 text-xs lg:text-sm whitespace-nowrap flex-shrink-0 text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)]"
+            >
+              <IconArrowUpRight />
+              AI领航者
+            </a>
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 lg:gap-6 flex-shrink-0 ml-4">
           {selectedDemo && (
-            <button 
-              onClick={handleReset}
-              className="px-3 py-1 bg-red-50 text-red-600 border border-red-100 rounded text-[11px] font-medium hover:bg-red-100 transition-colors"
-            >
-              退出并重置演示
+            <button onClick={handleReset} className="ui-btn border border-[color:var(--border)] h-9 text-xs px-3 lg:px-4 whitespace-nowrap hover:bg-[color:var(--danger-subtle)] hover:text-[color:var(--danger)] hover:border-[color:var(--danger)] transition-all">
+              <span className="hidden sm:inline">退出演示</span>
+              <span className="sm:hidden">退出</span>
             </button>
           )}
-          <div className="h-4 w-[1px] bg-gray-200"></div>
-          <div className="text-[11px] font-medium text-gray-500">
-            {selectedDemo ? `当前场景：${selectedDemo.title}` : activeLabel}
+          <div className="h-4 w-[1px] bg-[color:var(--border)] hidden sm:block"></div>
+          <div className="text-xs font-medium text-[color:var(--text-3)] hidden sm:block truncate max-w-[120px] lg:max-w-none tracking-wide">
+            {selectedDemo ? selectedDemo.title : activeLabel}
           </div>
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden">
-        {selectedDemo ? (
-          <Workspace demo={selectedDemo} currentApp={currentApp} initialView={workspaceInitialView} />
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative z-10">
+        {currentApp === 'efficiency' ? (
+          <Efficiency />
+        ) : selectedDemo ? (
+          (demoViewMode === 'flow') ? (
+            <DemoFlow demo={selectedDemo} onEnterApp={() => setDemoViewMode('workspace')} />
+          ) : (
+            <Workspace demo={selectedDemo} currentApp={currentApp} initialView={workspaceInitialView} />
+          )
         ) : currentApp === 'home' ? (
-          <div className="flex-1 flex overflow-hidden">
-            <div className="flex-1 overflow-y-auto no-scrollbar p-6">
-              <div className="max-w-6xl mx-auto">
-                <section className="rounded-3xl overflow-hidden border border-gray-200 bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-500 shadow-sm">
-                  <div className="px-10 py-10 md:px-12 md:py-12 relative">
-                    <div className="max-w-2xl">
-                      <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">欢迎来到飞书 AI 售前样板间</h2>
-                      <p className="mt-4 text-sm text-white/80 leading-relaxed">用最短路径把客户需求翻译成方案故事线：数据结构化 → AI 洞察 → 行动闭环。</p>
-                      <div className="mt-7 flex items-center gap-3">
+          <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+            <div className="flex-1 overflow-y-auto no-scrollbar p-4 lg:p-12 pb-24 lg:pb-12">
+              <div className="max-w-7xl mx-auto space-y-8 lg:space-y-12">
+                <section className="ui-card overflow-hidden border border-[color:var(--border)] shadow-[var(--shadow-sm)]">
+                  <div className="px-8 py-10 lg:px-20 lg:py-20 relative overflow-hidden">
+                    <div className="max-w-3xl relative z-10">
+                      <h2 className="text-3xl lg:text-5xl font-semibold text-[color:var(--text)] tracking-tight leading-tight min-h-[3em]">
+                        <TextType
+                          text={['欢迎来到\n飞书 AI 售前样板间']}
+                          typingSpeed={100}
+                          cursorCharacter="|"
+                          loop={false}
+                          showCursor={true}
+                        />
+                      </h2>
+                      <p className="mt-4 lg:mt-6 text-base lg:text-lg text-[color:var(--text-2)] leading-relaxed max-w-2xl font-light">
+                        用最短路径把客户需求翻译成方案故事线：<br/>数据结构化 → AI 洞察 → 行动闭环。
+                      </p>
+                      <div className="mt-8 lg:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 lg:gap-5">
                         <button
                           onClick={() => setCurrentApp('demo')}
-                          className="px-5 py-2 bg-white text-blue-700 text-xs font-black rounded-xl hover:bg-white/90 shadow-lg transition-all"
+                          className="ui-btn bg-white text-black hover:bg-gray-100 h-11 px-8 text-sm justify-center font-medium transition-transform active:scale-95"
                         >
-                          开始探索 →
+                          开始探索
+                          <IconArrowRight />
                         </button>
                         <button
                           onClick={() => setCurrentApp('efficiency')}
-                          className="px-5 py-2 bg-white/10 text-white text-xs font-black rounded-xl hover:bg-white/15 border border-white/20 transition-all"
+                          className="ui-btn border border-[color:var(--border)] h-11 px-8 text-sm justify-center hover:bg-[color:var(--bg-subtle)] font-medium transition-colors"
                         >
                           打开效率工具
                         </button>
                       </div>
                     </div>
-                    <div className="absolute -right-20 -top-24 w-96 h-96 rounded-full bg-white/10 blur-3xl" />
-                    <div className="absolute -right-10 -bottom-24 w-80 h-80 rounded-full bg-white/10 blur-3xl" />
+                    
+                    {/* Decorative Image */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 h-[120%] w-[50%] hidden lg:flex items-center justify-center pointer-events-none z-0 opacity-80 mix-blend-normal">
+                      <img 
+                        src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2000_09_48.png" 
+                        alt="" 
+                        className="max-w-full max-h-full object-contain transform scale-[1.15]"
+                      />
+                    </div>
                   </div>
                 </section>
 
-                <section className="mt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center text-[11px] font-black text-red-600">🚀</div>
-                      <h3 className="text-sm font-black text-gray-800 tracking-tight">上线啦</h3>
+                <section>
+                  <div className="flex items-center justify-between mb-6 lg:mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[color:var(--bg-subtle)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text)] shadow-sm">
+                        <IconClock />
+                      </div>
+                      <h3 className="text-lg font-semibold text-[color:var(--text)] tracking-tight">最新 Demo</h3>
                     </div>
                   </div>
 
-                  <div className="mt-4 flex gap-4 overflow-x-auto no-scrollbar pb-2">
-                    {ruirui && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                    {DEMO_LIST.map((demo) => (
                       <button
-                        onClick={() => openEfficiencyTool(ruirui.url)}
-                        className="flex-shrink-0 w-[260px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
+                        key={demo.id}
+                        onClick={() => {
+                          setWorkspaceInitialView('main');
+                          setSelectedDemo(demo);
+                          setCurrentApp('demo');
+                          setDemoViewMode('flow');
+                        }}
+                        className="ui-card group overflow-hidden text-left relative hover:shadow-2xl transition-all duration-500 border-0 bg-white h-[320px] flex flex-col"
                       >
-                        <div className="h-24 bg-gradient-to-br from-indigo-600 to-blue-600" />
-                        <div className="p-4">
-                          <div className="flex items-center justify-between">
-                            <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-black">{ruirui.name}</span>
-                            <span className="text-[10px] font-black text-red-500">NEW</span>
+                        <div className="absolute inset-0 z-0">
+                           {demo.id === 'inspection' ? (
+                            <img src={INSPECTION_COVER_URL} alt="" className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                          ) : demo.id === 'gtm' ? (
+                            <img src={GTM_COVER_URL} alt="" className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                          ) : (
+                            <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+                              <IconGrid />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
+                        </div>
+                        
+                        <div className="relative z-10 p-6 flex flex-col h-full justify-end text-white">
+                          <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                            <div className="flex items-center gap-2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                               <span className="px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-[10px] font-medium tracking-wide">
+                                 方案 Demo
+                               </span>
+                            </div>
+                            <h4 className="text-xl lg:text-2xl font-bold mb-2 text-white leading-tight shadow-sm">{demo.title}</h4>
+                            <p className="text-sm text-white/80 line-clamp-2 leading-relaxed font-light mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                              {demo.valueProp}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs font-medium text-white/90 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                              <span>进入体验</span>
+                              <IconArrowRight />
+                            </div>
                           </div>
-                          <div className="mt-2 text-sm font-black text-gray-900">{ruirui.title}</div>
                         </div>
                       </button>
-                    )}
-
-                    {tantan && (
-                      <button
-                        onClick={() => openEfficiencyTool(tantan.url)}
-                        className="flex-shrink-0 w-[260px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
-                      >
-                        <div className="h-24 bg-gradient-to-br from-emerald-600 to-teal-500" />
-                        <div className="p-4">
-                          <div className="flex items-center justify-between">
-                            <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-black">{tantan.name}</span>
-                            <span className="text-[10px] font-black text-red-500">NEW</span>
-                          </div>
-                          <div className="mt-2 text-sm font-black text-gray-900">{tantan.title}</div>
-                        </div>
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => openInspection('main')}
-                      className="flex-shrink-0 w-[260px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
-                    >
-                      <div className="h-24 bg-gradient-to-br from-orange-500 to-amber-500" />
-                      <div className="p-4">
-                        <div className="flex items-center justify-between">
-                          <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-black">巡检</span>
-                          <span className="text-[10px] font-black text-red-500">NEW</span>
-                        </div>
-                        <div className="mt-2 text-sm font-black text-gray-900">AI 智能巡检 | EHS & 设备管理</div>
-                      </div>
-                    </button>
-
-                    {[1, 2].map((i) => (
-                      <div key={i} className="flex-shrink-0 w-[260px] bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-                        <div className="h-24 bg-gradient-to-br from-gray-200 to-gray-100" />
-                        <div className="p-4">
-                          <div className="flex items-center justify-between">
-                            <span className="inline-flex items-center px-2 py-0.5 bg-gray-50 text-gray-500 rounded text-[10px] font-black">待制作</span>
-                          </div>
-                          <div className="mt-2 text-sm font-black text-gray-600">更多能力筹备中</div>
-                        </div>
-                      </div>
                     ))}
+
+                    <div className="ui-card overflow-hidden text-left bg-[color:var(--bg-subtle)] border border-dashed border-[color:var(--border)] hover:border-[color:var(--text-3)] cursor-default flex flex-col justify-center items-center text-center p-8 h-[320px] backdrop-blur-sm transition-colors group">
+                      <div className="w-12 h-12 rounded-full bg-[color:var(--surface)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-3)] mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <IconGrid />
+                      </div>
+                      <h4 className="text-sm font-medium text-[color:var(--text)] mb-2">更多 Demo 正在制作</h4>
+                      <p className="text-xs text-[color:var(--text-3)] max-w-[200px] leading-relaxed">后续会持续补充更多行业与角色场景。</p>
+                    </div>
                   </div>
                 </section>
 
-                <section className="mt-8">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[11px] font-black text-blue-600">🧠</div>
-                      <h3 className="text-sm font-black text-gray-800 tracking-tight">咨询洞察</h3>
+                <section>
+                  <div className="flex items-center justify-between mb-6 lg:mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[color:var(--bg-subtle)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text)] shadow-sm">
+                        <IconZap />
+                      </div>
+                      <h3 className="text-lg font-semibold text-[color:var(--text)] tracking-tight">最新效率工具</h3>
                     </div>
-                    <span className="text-[11px] font-bold text-gray-400">更多 →</span>
                   </div>
 
-                  {[
-                    {
-                      tag: '行业洞察',
-                      date: '2025-12-20',
-                      title: 'GTM 访谈提效：从 60 分钟到 15 分钟的需求收敛',
-                      desc: '通过互动式调研提前对齐关注点，现场只做关键追问与方案匹配，让客户体验“AI 很懂我”。',
-                      author: 'AirDemo Research'
-                    },
-                    {
-                      tag: '售前方法论',
-                      date: '2025-12-12',
-                      title: '汇报复盘的 5 个关键维度：价值、贴合度、互动、异议、表达',
-                      desc: '把“讲功能”升级为“讲管理思想与业务价值”，并且用数据与案例形成可复用的故事线。',
-                      author: 'AirDemo SalesOps'
-                    },
-                    {
-                      tag: '案例复用',
-                      date: '2025-12-05',
-                      title: '巡检场景演示脚本：数据结构化 + AI 洞察 + 行动闭环',
-                      desc: '用三张表把“人员违规—管理跟进—设备健康度”串起来，让客户看到闭环的确定性。',
-                      author: 'AirDemo Solution'
-                    }
-                  ].map((it) => (
-                    <div key={`${it.date}-${it.title}`} className="mt-4 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex items-start gap-5">
-                        <div className="w-28 h-16 rounded-xl bg-gradient-to-br from-gray-200 to-gray-100 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-black uppercase">{it.tag}</span>
-                            <span className="text-[10px] font-bold text-gray-400">{it.date}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
+                    {EFFICIENCY_TOOLS.map((tool) => (
+                      <button
+                        key={tool.id}
+                        onClick={() => openEfficiencyTool(tool.url)}
+                        className="ui-card p-6 lg:p-8 text-left group hover:border-[color:var(--border-strong)] transition-all duration-300 backdrop-blur-md bg-[color:var(--surface)]/60 hover:bg-[color:var(--surface)]/80 border border-[color:var(--border)] hover:shadow-[var(--shadow-md)]"
+                      >
+                        <div className="flex items-start justify-between gap-5">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="ui-tag px-2 py-1 text-[10px] font-medium tracking-wide border border-[color:var(--border)] rounded text-[color:var(--text-2)] bg-[color:var(--bg-subtle)]">{tool.name}</span>
+                              <span className="text-[10px] font-bold text-[color:var(--text)] bg-[color:var(--bg-subtle)] px-2 py-0.5 rounded-full border border-[color:var(--border)]">NEW</span>
+                            </div>
+                            <h4 className="text-base lg:text-lg font-semibold text-[color:var(--text)] mb-2 group-hover:text-white transition-colors">{tool.title}</h4>
+                            <p className="text-sm text-[color:var(--text-2)] line-clamp-2 leading-relaxed mb-4 font-light">{tool.highlight}</p>
+                            <div className="flex flex-wrap gap-2">
+                              {tool.skills.slice(0, 3).map(skill => (
+                                <span key={skill} className="text-[10px] text-[color:var(--text-3)] bg-[color:var(--bg-subtle)] px-2 py-1 rounded border border-[color:var(--border)]">
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                          <div className="mt-2 text-sm font-black text-gray-900">{it.title}</div>
-                          <div className="mt-2 text-[11px] text-gray-500 leading-relaxed">{it.desc}</div>
-                          <div className="mt-3 text-[10px] font-bold text-gray-400">作者：{it.author}</div>
+                          <div className="text-[color:var(--text-3)] group-hover:text-white transition-colors transform group-hover:translate-x-1 duration-300">
+                            <IconArrowUpRight />
+                          </div>
                         </div>
+                      </button>
+                    ))}
+
+                    <div className="ui-card p-6 lg:p-8 text-left bg-[color:var(--bg-subtle)] border border-dashed border-[color:var(--border)] flex items-center justify-center text-center cursor-default min-h-[160px] backdrop-blur-sm transition-colors hover:border-[color:var(--text-3)]">
+                      <div>
+                        <div className="inline-flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-[color:var(--surface)] border border-[color:var(--border)] text-[color:var(--text-3)] mb-3 lg:mb-4">
+                          <IconZap />
+                        </div>
+                        <h4 className="text-sm font-medium text-[color:var(--text)] mb-1">更多效率工具</h4>
+                        <p className="text-xs text-[color:var(--text-3)]">正在制作中...</p>
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </section>
               </div>
             </div>
 
-            <aside className="w-[340px] border-l border-gray-200 bg-white flex flex-col flex-shrink-0">
-              <div className="h-12 border-b border-gray-100 flex items-center justify-between px-5">
-                <div className="text-xs font-black text-gray-800">首页 AI 助手</div>
-                <button onClick={() => setHomeMessages([{ role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }])} className="text-[10px] font-bold text-gray-300 hover:text-gray-500 transition-colors">
-                  清空
+            <aside
+              className={`w-full lg:w-[360px] h-[300px] lg:h-auto border-t lg:border-t-0 lg:border-l border-[color:var(--border)] ui-card rounded-none lg:rounded-none border-0 lg:border-l flex flex-col flex-shrink-0 shadow-[var(--shadow-xl)] z-40 lg:relative absolute bottom-0 lg:bottom-auto transition-transform duration-300 transform backdrop-blur-xl lg:translate-y-0 ${isHomeChatCollapsed ? 'translate-y-[252px]' : 'translate-y-0'}`}
+            >
+              <div className="h-12 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 lg:px-6 bg-transparent">
+                <button
+                  type="button"
+                  onClick={() => setIsHomeChatCollapsed((v) => !v)}
+                  className="flex items-center gap-2 text-sm font-bold text-[color:var(--text)] min-w-0 lg:pointer-events-none"
+                  aria-label={isHomeChatCollapsed ? '展开首页 AI 助手' : '折叠首页 AI 助手'}
+                >
+                  <IconMessage />
+                  <span>首页 AI 助手</span>
+                  <IconChevronDown className={`lg:hidden transition-transform ${isHomeChatCollapsed ? '' : 'rotate-180'}`} />
                 </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setHomeMessages([{ role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }])}
+                    className="ui-btn ui-btn-ghost h-8 px-3 text-xs"
+                  >
+                    清空
+                  </button>
+                </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3 bg-[#fafafa]">
+              <div className={`flex-1 overflow-y-auto no-scrollbar p-4 lg:p-6 space-y-4 bg-transparent ${isHomeChatCollapsed ? 'hidden lg:block' : ''}`}>
                 {homeMessages.map((m, idx) => (
                   <div key={idx} className={`flex ${m.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
-                    <div className={`max-w-[92%] p-3 rounded-2xl text-[11px] border shadow-sm ${m.role === 'ai' ? 'bg-white border-gray-100 text-gray-800' : 'bg-blue-600 border-blue-500 text-white'}`}>
+                    <div className={`max-w-[90%] p-3 lg:p-4 rounded-2xl text-xs lg:text-sm leading-relaxed border shadow-[var(--shadow-sm)] ${m.role === 'ai' ? 'bg-[color:var(--surface)]/80 border-[color:var(--border)] text-[color:var(--text)] backdrop-blur-md' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
                       {m.text}
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="p-4 border-t border-gray-100 bg-white">
-                <div className="flex flex-wrap gap-2 mb-3">
-                  <button onClick={() => setHomeInput('探探')} className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-full text-[10px] font-bold text-gray-600 hover:bg-gray-100 transition-colors">探探</button>
-                  <button onClick={() => setHomeInput('睿睿')} className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-full text-[10px] font-bold text-gray-600 hover:bg-gray-100 transition-colors">睿睿</button>
-                  <button onClick={() => setHomeInput('巡检')} className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-full text-[10px] font-bold text-gray-600 hover:bg-gray-100 transition-colors">巡检</button>
+              <div className={`p-4 lg:p-6 border-t border-[color:var(--border)] bg-transparent ${isHomeChatCollapsed ? 'hidden lg:block' : ''}`}>
+                <div className="flex flex-wrap gap-2 mb-3 lg:mb-4">
+                  <button onClick={() => setHomeInput('探探')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-2 lg:px-3 text-[10px] lg:text-xs rounded-full">探探</button>
+                  <button onClick={() => setHomeInput('睿睿')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-2 lg:px-3 text-[10px] lg:text-xs rounded-full">睿睿</button>
+                  <button onClick={() => setHomeInput('巡检')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-2 lg:px-3 text-[10px] lg:text-xs rounded-full">巡检</button>
                 </div>
                 <div className="relative">
                   <input
@@ -308,197 +396,21 @@ const App: React.FC = () => {
                       if (e.key === 'Enter') sendHomeMessage();
                     }}
                     placeholder="输入你的问题…"
-                    className="w-full border border-gray-200 rounded-xl py-3 pl-4 pr-11 text-[11px] focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50 shadow-inner transition-all"
+                    className="ui-input pr-10 lg:pr-12 h-10 lg:h-11 text-xs lg:text-sm"
                   />
                   <button
                     onClick={sendHomeMessage}
-                    className="absolute right-3 top-3 text-blue-600 hover:scale-110 transition-transform"
+                    className="absolute right-1.5 lg:right-2 top-1.5 lg:top-2 bottom-1.5 lg:bottom-2 w-8 flex items-center justify-center text-[color:var(--primary)] hover:bg-[color:var(--primary-subtle)] rounded-[var(--radius-sm)] transition-colors"
                   >
-                    <svg className="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    <IconSend />
                   </button>
                 </div>
               </div>
             </aside>
           </div>
         ) : currentApp === 'demo' ? (
-          <Catalog onSelectDemo={(demo) => { setWorkspaceInitialView('main'); setSelectedDemo(demo); setCurrentApp('demo'); }} />
-        ) : currentApp === 'prompt' ? (
-          <div className="flex-1 p-8 overflow-y-auto bg-gray-50 animate-fadeIn">
-            <div className="max-w-4xl mx-auto">
-              <header className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">提示词模版库</h2>
-                <p className="text-sm text-gray-500">这些专业提示词可直接复制到对话中使用。</p>
-              </header>
-              <div className="grid grid-cols-1 gap-6">
-                {PROMPT_TEMPLATES.map(tmp => (
-                  <div key={tmp.id} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase mb-2">{tmp.category}</span>
-                        <h3 className="text-lg font-bold text-gray-800">{tmp.title}</h3>
-                        <p className="text-xs text-gray-500 mt-1">{tmp.description}</p>
-                      </div>
-                      <button
-                        onClick={async () => {
-                          try {
-                            await navigator.clipboard.writeText(tmp.prompt);
-                          } catch {
-                          }
-                        }}
-                        className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center gap-2"
-                      >
-                        复制指令
-                      </button>
-                    </div>
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 font-mono text-[11px] text-gray-600 leading-relaxed italic">
-                      "{tmp.prompt}"
-                    </div>
-
-                    <details className="mt-4 group">
-                      <summary className="cursor-pointer select-none text-xs font-bold text-gray-700 flex items-center gap-2">
-                        业务上下文
-                        <span className="text-[10px] font-semibold text-gray-400 group-open:hidden">展开</span>
-                        <span className="text-[10px] font-semibold text-gray-400 hidden group-open:inline">收起</span>
-                      </summary>
-                      <div className="mt-3 bg-white border border-gray-100 rounded-xl p-4 text-[11px] text-gray-600 space-y-3">
-                        <div className="space-y-1">
-                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">场景</div>
-                          <div className="leading-relaxed">{tmp.scenario.background}</div>
-                          <div className="leading-relaxed"><span className="font-bold text-gray-700">目标：</span>{tmp.scenario.goal}</div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">输入 / 输出</div>
-                          <div className="flex flex-wrap gap-2">
-                            {tmp.scenario.inputs.map((it) => (
-                              <span key={`in-${it}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">{it}</span>
-                            ))}
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {tmp.scenario.outputs.map((it) => (
-                              <span key={`out-${it}`} className="px-2 py-0.5 rounded-full border border-blue-100 bg-blue-50 text-[10px] font-semibold text-blue-700">{it}</span>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">MCP</div>
-                          <div className="space-y-2">
-                            {tmp.mcps.map((cap) => (
-                              <div key={cap.name} className="border border-gray-100 rounded-lg p-3 bg-gray-50/60">
-                                <div className="text-[11px] font-bold text-gray-700">{cap.name}</div>
-                                <div className="text-[10px] text-gray-500 mt-0.5">{cap.description}</div>
-                                <div className="mt-2 flex flex-wrap gap-2">
-                                  {cap.tools.map((tool) => (
-                                    <span key={`${cap.name}-${tool.name}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-white text-[10px] font-semibold text-gray-600">
-                                      {tool.name}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Skills</div>
-                          <div className="flex flex-wrap gap-2">
-                            {tmp.skills.map((s) => (
-                              <span key={s} className="px-2 py-0.5 rounded-full border border-gray-200 bg-white text-[10px] font-semibold text-gray-600">{s}</span>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Agents</div>
-                          <div className="space-y-2">
-                            {tmp.agents.map((a) => (
-                              <div key={a.name} className="border border-gray-100 rounded-lg p-3">
-                                <div className="flex items-baseline justify-between gap-2">
-                                  <div className="text-[11px] font-bold text-gray-700">{a.name}</div>
-                                  <div className="text-[10px] font-semibold text-gray-400">{a.role}</div>
-                                </div>
-                                <div className="mt-2 flex flex-wrap gap-2">
-                                  {a.responsibilities.map((r) => (
-                                    <span key={`${a.name}-${r}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">{r}</span>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </details>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex-1 p-8 overflow-y-auto bg-gray-50 animate-fadeIn">
-            <div className="max-w-5xl mx-auto">
-              <header className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">效率工具</h2>
-                <p className="text-sm text-gray-500">售前过程中的高频提效助手，一键打开即用。</p>
-              </header>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {EFFICIENCY_TOOLS.map((tool) => (
-                  <div key={tool.id} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase">{tool.name}</span>
-                          <h3 className="text-lg font-bold text-gray-800 truncate">{tool.title}</h3>
-                        </div>
-                        <a href={tool.url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-[11px] text-gray-500 hover:text-blue-600 truncate">
-                          {tool.url}
-                        </a>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <a
-                          href={tool.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all"
-                        >
-                          打开
-                        </a>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await navigator.clipboard.writeText(tool.url);
-                            } catch {
-                            }
-                          }}
-                          className="px-4 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-50 transition-all"
-                        >
-                          复制链接
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="mt-5">
-                      <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">核心技能</div>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {tool.skills.map((s) => (
-                          <span key={`${tool.id}-${s}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-5 bg-gray-50 rounded-xl p-4 border border-gray-100 text-[11px] text-gray-600 leading-relaxed italic">
-                      “{tool.highlight}”
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+          <Catalog onSelectDemo={(demo) => { setWorkspaceInitialView('main'); setSelectedDemo(demo); setCurrentApp('demo'); setDemoViewMode('flow'); }} />
+        ) : null}
       </main>
     </div>
   );

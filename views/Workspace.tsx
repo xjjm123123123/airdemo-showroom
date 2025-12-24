@@ -1,14 +1,27 @@
-
 import React, { useState, useEffect, useRef } from 'react';
+import Prism from '../components/Prism';
+import Loading from '../components/Loading';
 import { GoogleGenAI } from "@google/genai";
 import { BusinessContext, Demo } from '../types';
-import { EFFICIENCY_TOOLS, PROMPT_TEMPLATES } from '../constants';
+import { EFFICIENCY_TOOLS } from '../constants';
 
-type AppId = 'home' | 'demo' | 'efficiency' | 'prompt';
+type AppId = 'home' | 'demo' | 'efficiency';
 type ViewId = 'main' | 'management' | 'equipment' | 'factory';
 type SecondaryViewId = Exclude<ViewId, 'main'>;
 type FieldType = 'text' | 'number' | 'select' | 'image';
 type BaseViewMode = 'table' | 'app';
+
+// Icons
+const IconHash = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>;
+const IconType = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>;
+const IconList = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>;
+const IconImage = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>;
+const IconZap = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>;
+const IconFileText = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
+const IconArrowUpRight = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>;
+const IconMessage = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
+const IconSend = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>;
+const IconGrid = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
 
 interface WorkspaceProps {
   demo: Demo;
@@ -24,13 +37,14 @@ interface ColumnDef {
 
 const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) => {
   const [isAiRunning, setIsAiRunning] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(true);
 
   const baseIframeUrl = 'https://bytedance.larkoffice.com/base/Rcbrbk2qCazsPTs48TecJSIKnod?from=from_copylink';
   const baseAppIframeUrl = 'https://bytedance.larkoffice.com/app/Vv6DbpDoGawcMwszp3XcMms6nTf';
   
   // UI State
   const [currentView, setCurrentView] = useState<ViewId>(initialView || 'main');
-  const [baseViewMode, setBaseViewMode] = useState<BaseViewMode>('table');
+  const [baseViewMode, setBaseViewMode] = useState<BaseViewMode>('app');
   
   // State for current active table and columns
   const [editableMainData, setEditableMainData] = useState<any[]>(demo.mainTable);
@@ -66,8 +80,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
   useEffect(() => {
     setShowAddColumn(false);
     setEditingCell(null);
-    if (currentApp !== 'demo') setBaseViewMode('table');
+    if (currentApp !== 'demo') setBaseViewMode('app');
   }, [currentApp]);
+
+  useEffect(() => {
+    setIframeLoading(true);
+  }, [baseViewMode]);
 
   useEffect(() => {
     setEditableMainData(demo.mainTable);
@@ -322,20 +340,20 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
 
   const getHeaderIcon = (type: FieldType) => {
     switch(type) {
-      case 'number': return <span className="text-blue-500 font-mono text-xs mr-2">#</span>;
-      case 'select': return <span className="text-orange-400 text-xs mr-2">◉</span>;
-      case 'image': return <span className="text-purple-400 text-xs mr-2">🖼️</span>;
-      default: return <span className="text-gray-400 text-xs mr-2">Aa</span>;
+      case 'number': return <span className="text-blue-500 mr-2"><IconHash /></span>;
+      case 'select': return <span className="text-orange-400 mr-2"><IconList /></span>;
+      case 'image': return <span className="text-purple-400 mr-2"><IconImage /></span>;
+      default: return <span className="text-gray-400 mr-2"><IconType /></span>;
     }
   };
 
   const getPillColor = (value: string) => {
     const v = String(value).trim();
     if (!v) return 'bg-gray-50 text-gray-300 border-gray-100';
-    if (['高', '不合规', '紧急', '进行中', '在岗玩手机', '睡岗', '走路玩手机'].includes(v)) return 'bg-red-100 text-red-600 border-red-200';
-    if (['无', '合规', '已完成', '已交付', '生产部'].includes(v)) return 'bg-green-100 text-green-600 border-green-200';
-    if (['处理中', '中', 'AI识别结论', '不符合5s标准', '机械工艺师'].includes(v)) return 'bg-blue-100 text-blue-600 border-blue-200';
-    return 'bg-gray-100 text-gray-600 border-gray-200';
+    if (['高', '不合规', '紧急', '进行中', '在岗玩手机', '睡岗', '走路玩手机'].includes(v)) return 'bg-red-50 text-red-600 border-red-100';
+    if (['无', '合规', '已完成', '已交付', '生产部'].includes(v)) return 'bg-green-50 text-green-600 border-green-100';
+    if (['处理中', '中', 'AI识别结论', '不符合5s标准', '机械工艺师'].includes(v)) return 'bg-blue-50 text-blue-600 border-blue-100';
+    return 'bg-gray-50 text-gray-600 border-gray-100';
   };
 
   const appImageColumn = columns.find((c) => c.type === 'image' && c.key !== 'id');
@@ -387,6 +405,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
     return m;
   };
 
+  // ... (Chart components removed for brevity, will rely on simple HTML/CSS if needed or keep existing)
+  // Actually, keeping the charts but cleaning them up
   const LineChart: React.FC<{ labels: string[]; values: number[]; color: string }> = ({ labels, values, color }) => {
     const max = Math.max(1, ...values);
     const w = 420;
@@ -407,114 +427,38 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-36">
         <defs>
           <linearGradient id="lineFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity={0.25} />
+            <stop offset="0%" stopColor={color} stopOpacity={0.1} />
             <stop offset="100%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
         <path d={`M ${area}`} fill="url(#lineFill)" />
-        <polyline points={pts} fill="none" stroke={color} strokeWidth="2.5" />
+        <polyline points={pts} fill="none" stroke={color} strokeWidth="2" />
         {values.map((v, i) => {
           const x = pad + step * i;
           const y = pad + (h - pad * 2) * (1 - v / max);
-          return <circle key={`p-${i}`} cx={x} cy={y} r={3.2} fill={color} />;
+          return <circle key={`p-${i}`} cx={x} cy={y} r={3} fill={color} />;
         })}
-        {labels.length > 0 ? (
-          <text x={pad} y={h - 4} fill="#9ca3af" fontSize="10" fontWeight="700">
-            {labels[0]}
-          </text>
-        ) : null}
-        {labels.length > 1 ? (
-          <text x={w - pad} y={h - 4} textAnchor="end" fill="#9ca3af" fontSize="10" fontWeight="700">
-            {labels[labels.length - 1]}
-          </text>
-        ) : null}
       </svg>
     );
   };
 
-  const PieChart: React.FC<{ items: { label: string; value: number; color: string }[] }> = ({ items }) => {
-    const total = items.reduce((s, it) => s + it.value, 0) || 1;
-    const cx = 72;
-    const cy = 72;
-    const r = 56;
-    let acc = 0;
-    const arcs = items.map((it) => {
-      const start = (acc / total) * Math.PI * 2;
-      acc += it.value;
-      const end = (acc / total) * Math.PI * 2;
-      const x1 = cx + r * Math.cos(start - Math.PI / 2);
-      const y1 = cy + r * Math.sin(start - Math.PI / 2);
-      const x2 = cx + r * Math.cos(end - Math.PI / 2);
-      const y2 = cy + r * Math.sin(end - Math.PI / 2);
-      const large = end - start > Math.PI ? 1 : 0;
-      const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
-      return { ...it, d };
-    });
-
-    return (
-      <div className="flex items-center gap-4">
-        <svg viewBox="0 0 144 144" className="w-36 h-36 flex-shrink-0">
-          <circle cx={cx} cy={cy} r={r} fill="#f3f4f6" />
-          {arcs.map((a) => (
-            <path key={a.label} d={a.d} fill={a.color} opacity={0.95} />
-          ))}
-          <circle cx={cx} cy={cy} r={34} fill="#ffffff" />
-          <text x={cx} y={cy - 2} textAnchor="middle" fill="#111827" fontSize="16" fontWeight="900">
-            {total}
-          </text>
-          <text x={cx} y={cy + 16} textAnchor="middle" fill="#9ca3af" fontSize="10" fontWeight="800">
-            总量
-          </text>
-        </svg>
-        <div className="flex-1 space-y-2">
-          {items.map((it) => (
-            <div key={it.label} className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: it.color }} />
-                <span className="text-[11px] font-bold text-gray-700 truncate">{it.label}</span>
-              </div>
-              <span className="text-[11px] font-bold text-gray-600">{it.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  const BarChart: React.FC<{ items: { label: string; value: number; color: string }[]; horizontal?: boolean }> = ({ items, horizontal }) => {
-    const max = Math.max(1, ...items.map((x) => x.value));
-    return (
-      <div className="space-y-2">
-        {items.map((it) => (
-          <div key={it.label} className="flex items-center gap-3">
-            <div className={`text-[10px] font-bold text-gray-500 ${horizontal ? 'w-16' : 'w-24'} truncate`}>{it.label}</div>
-            <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden border border-gray-200">
-              <div className="h-full" style={{ width: `${Math.max(3, (it.value / max) * 100)}%`, backgroundColor: it.color, opacity: 0.85 }} />
-            </div>
-            <div className="text-[10px] font-black text-gray-600 w-8 text-right">{it.value}</div>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
-    <div className="h-full w-full flex overflow-hidden bg-[#f5f6f7]">
-      <section className="flex-1 flex flex-col min-w-0 bg-white relative">
-        <div className="flex-1 flex flex-col overflow-hidden bg-[#f5f6f7]">
+    <div className="h-full w-full flex flex-col lg:flex-row overflow-hidden bg-white font-sans relative text-slate-900">
+      <section className="flex-1 flex flex-col min-w-0 bg-white relative overflow-hidden order-1">
+        <div className="flex-1 flex flex-col overflow-hidden bg-white">
           {currentApp === 'demo' ? (
-            <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn">
-               <div className="h-10 bg-white border-b border-gray-100 flex items-center px-4 gap-4 flex-shrink-0 z-10">
-                  <div className="ml-auto inline-flex rounded-xl border border-gray-200 bg-gray-50 p-0.5">
+            <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn relative">
+               <div className="h-14 bg-white border-b border-gray-100 flex items-center px-6 lg:px-8 gap-6 flex-shrink-0 z-10">
+                  <div className="ml-auto inline-flex rounded-[var(--radius-md)] border border-gray-200 bg-gray-50 p-1">
                     <button
                       onClick={() => setBaseViewMode('table')}
-                      className={`px-3 py-1 text-[10px] font-bold rounded-lg transition-colors ${baseViewMode === 'table' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                      className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${baseViewMode === 'table' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-900'}`}
                     >
                       多维表格
                     </button>
                     <button
                       onClick={() => setBaseViewMode('app')}
-                      className={`px-3 py-1 text-[10px] font-bold rounded-lg transition-colors ${baseViewMode === 'app' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}
+                      className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${baseViewMode === 'app' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-900'}`}
                     >
                       应用模式
                     </button>
@@ -522,247 +466,100 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
                </div>
                
                {baseViewMode === 'table' ? (
-                 <div className="flex-1 bg-white">
+                 <div className="flex-1 bg-white relative">
+                   {iframeLoading && <Loading />}
                    <iframe
                      src={baseIframeUrl}
                      title="Lark Base"
                      className="w-full h-full border-0"
                      allow="clipboard-read; clipboard-write; fullscreen"
                      allowFullScreen
+                     onLoad={() => setIframeLoading(false)}
                    />
                  </div>
               ) : (
-                <div className="flex-1 bg-white">
+                <div className="flex-1 bg-white relative">
+                  {iframeLoading && <Loading />}
                   <iframe
                     src={baseAppIframeUrl}
                     title="Lark App"
                     className="w-full h-full border-0"
                     allow="clipboard-read; clipboard-write; fullscreen"
                     allowFullScreen
+                    onLoad={() => setIframeLoading(false)}
                   />
                 </div>
               )}
             </div>
-          ) : currentApp === 'efficiency' ? (
-            <div className="flex-1 p-8 overflow-y-auto bg-gray-50 animate-fadeIn">
-              <div className="max-w-4xl mx-auto">
-                <header className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">效率工具</h2>
-                  <p className="text-sm text-gray-500">售前过程中的高频提效助手，一键打开即用。</p>
-                </header>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {EFFICIENCY_TOOLS.map((tool) => (
-                    <div key={tool.id} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase">{tool.name}</span>
-                            <h3 className="text-lg font-bold text-gray-800 truncate">{tool.title}</h3>
-                          </div>
-                          <a href={tool.url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-[11px] text-gray-500 hover:text-blue-600 truncate">
-                            {tool.url}
-                          </a>
-                        </div>
-
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <a
-                            href={tool.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all"
-                          >
-                            打开
-                          </a>
-                          <button
-                            onClick={async () => {
-                              try {
-                                await navigator.clipboard.writeText(tool.url);
-                              } catch {
-                              }
-                            }}
-                            className="px-4 py-2 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-50 transition-all"
-                          >
-                            复制链接
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="mt-5">
-                        <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">核心技能</div>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {tool.skills.map((s) => (
-                            <span key={`${tool.id}-${s}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">
-                              {s}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="mt-5 bg-gray-50 rounded-xl p-4 border border-gray-100 text-[11px] text-gray-600 leading-relaxed italic">
-                        “{tool.highlight}”
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : currentApp === 'prompt' ? (
-            <div className="flex-1 p-8 overflow-y-auto bg-gray-50 animate-fadeIn">
-               <div className="max-w-4xl mx-auto">
-                  <header className="mb-8">
-                     <h2 className="text-2xl font-bold text-gray-900 mb-2">提示词模版库</h2>
-                     <p className="text-sm text-gray-500">这些专业提示词定义了 Aily 分析巡检数据的深度逻辑。</p>
-                  </header>
-                  <div className="grid grid-cols-1 gap-6">
-                     {PROMPT_TEMPLATES.map(tmp => (
-                        <div key={tmp.id} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                           <div className="flex justify-between items-start mb-4">
-                              <div>
-                                 <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase mb-2">{tmp.category}</span>
-                                 <h3 className="text-lg font-bold text-gray-800">{tmp.title}</h3>
-                                 <p className="text-xs text-gray-500 mt-1">{tmp.description}</p>
-                              </div>
-                              <button onClick={() => { setActiveBusinessContext(tmp); setMessages(prev => [...prev, { role: 'user', text: `应用模板：${tmp.title}` }]); askGemini(tmp.prompt, tmp); }} className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center gap-2">
-                                 🚀 应用此指令
-                              </button>
-                           </div>
-                           <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 font-mono text-[11px] text-gray-600 leading-relaxed italic">
-                              "{tmp.prompt}"
-                           </div>
-
-                           <details className="mt-4 group">
-                             <summary className="cursor-pointer select-none text-xs font-bold text-gray-700 flex items-center gap-2">
-                               业务上下文
-                               <span className="text-[10px] font-semibold text-gray-400 group-open:hidden">展开</span>
-                               <span className="text-[10px] font-semibold text-gray-400 hidden group-open:inline">收起</span>
-                             </summary>
-                             <div className="mt-3 bg-white border border-gray-100 rounded-xl p-4 text-[11px] text-gray-600 space-y-3">
-                               <div className="space-y-1">
-                                 <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">场景</div>
-                                 <div className="leading-relaxed">{tmp.scenario.background}</div>
-                                 <div className="leading-relaxed"><span className="font-bold text-gray-700">目标：</span>{tmp.scenario.goal}</div>
-                               </div>
-
-                               <div className="space-y-2">
-                                 <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">输入 / 输出</div>
-                                 <div className="flex flex-wrap gap-2">
-                                   {tmp.scenario.inputs.map((it) => (
-                                     <span key={`in-${it}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">{it}</span>
-                                   ))}
-                                 </div>
-                                 <div className="flex flex-wrap gap-2">
-                                   {tmp.scenario.outputs.map((it) => (
-                                     <span key={`out-${it}`} className="px-2 py-0.5 rounded-full border border-blue-100 bg-blue-50 text-[10px] font-semibold text-blue-700">{it}</span>
-                                   ))}
-                                 </div>
-                               </div>
-
-                               <div className="space-y-2">
-                                 <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">MCP</div>
-                                 <div className="space-y-2">
-                                   {tmp.mcps.map((cap) => (
-                                     <div key={cap.name} className="border border-gray-100 rounded-lg p-3 bg-gray-50/60">
-                                       <div className="text-[11px] font-bold text-gray-700">{cap.name}</div>
-                                       <div className="text-[10px] text-gray-500 mt-0.5">{cap.description}</div>
-                                       <div className="mt-2 flex flex-wrap gap-2">
-                                         {cap.tools.map((tool) => (
-                                           <span key={`${cap.name}-${tool.name}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-white text-[10px] font-semibold text-gray-600">
-                                             {tool.name}
-                                           </span>
-                                         ))}
-                                       </div>
-                                     </div>
-                                   ))}
-                                 </div>
-                               </div>
-
-                               <div className="space-y-2">
-                                 <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Skills</div>
-                                 <div className="flex flex-wrap gap-2">
-                                   {tmp.skills.map((s) => (
-                                     <span key={s} className="px-2 py-0.5 rounded-full border border-gray-200 bg-white text-[10px] font-semibold text-gray-600">{s}</span>
-                                   ))}
-                                 </div>
-                               </div>
-
-                               <div className="space-y-2">
-                                 <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Agents</div>
-                                 <div className="space-y-2">
-                                   {tmp.agents.map((a) => (
-                                     <div key={a.name} className="border border-gray-100 rounded-lg p-3">
-                                       <div className="flex items-baseline justify-between gap-2">
-                                         <div className="text-[11px] font-bold text-gray-700">{a.name}</div>
-                                         <div className="text-[10px] font-semibold text-gray-400">{a.role}</div>
-                                       </div>
-                                       <div className="mt-2 flex flex-wrap gap-2">
-                                         {a.responsibilities.map((r) => (
-                                           <span key={`${a.name}-${r}`} className="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-[10px] font-semibold text-gray-600">{r}</span>
-                                         ))}
-                                       </div>
-                                     </div>
-                                   ))}
-                                 </div>
-                               </div>
-                             </div>
-                           </details>
-                        </div>
-                     ))}
-                  </div>
-               </div>
-            </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-300 flex-col gap-4">
-               <div className="text-6xl opacity-10">🏗️</div>
-               <p className="text-[10px] font-black uppercase tracking-widest">Building AI Modules...</p>
+            <div className="flex-1 flex items-center justify-center text-[color:var(--text-3)] flex-col gap-4">
+              <div className="text-6xl opacity-10 grayscale">
+                <IconGrid />
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-widest">Building AI Modules...</p>
             </div>
           )}
         </div>
       </section>
 
       {/* 3. AILY SIDEBAR */}
-      <aside className="w-80 border-l border-gray-200 bg-white flex flex-col flex-shrink-0 z-50 shadow-xl relative">
-        <div className="h-10 border-b border-gray-200 flex items-center justify-between px-4 bg-gray-50/80 backdrop-blur-sm sticky top-0 z-10">
+      <aside className="w-full lg:w-[360px] h-[35vh] lg:h-auto border-t lg:border-t-0 lg:border-l border-gray-200 bg-gray-50/50 flex flex-col flex-shrink-0 z-50 shadow-xl relative order-2">
+        <div className="h-14 lg:h-16 border-b border-gray-200 flex items-center justify-between px-6 bg-white sticky top-0 z-10">
            <div className="flex flex-col min-w-0">
-             <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-               <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center shadow-lg">
-                 <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+               <div className="w-6 h-6 bg-slate-900 rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm text-white">
+                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
                </div>
                Aily 分析工作台
              </h4>
              {activeBusinessContext && (
-               <div className="text-[9px] font-bold text-gray-300 tracking-tighter truncate">
+               <div className="text-[10px] font-semibold text-slate-400 tracking-tight truncate mt-1">
                  当前上下文：{activeBusinessContext.title}
                </div>
              )}
            </div>
-           <button onClick={() => setMessages([])} className="text-[10px] text-gray-400 hover:text-gray-600 font-bold tracking-tighter uppercase">Clear</button>
+           <button onClick={() => setMessages([])} className="text-xs font-medium text-slate-400 hover:text-slate-900 px-2 py-1 rounded hover:bg-gray-100 transition-colors">清空</button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar bg-[#fafafa]">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 no-scrollbar bg-gray-50">
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'} animate-fadeIn`}>
-              <div className={`max-w-[90%] p-3.5 rounded-2xl text-[11px] shadow-sm border ${msg.role === 'ai' ? 'bg-white border-gray-100 text-gray-800' : 'bg-blue-600 border-blue-500 text-white'}`}>
+              <div className={`max-w-[90%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm border ${msg.role === 'ai' ? 'bg-white border-gray-200 text-slate-800' : 'bg-slate-900 border-transparent text-white'}`}>
                 {msg.text}
               </div>
             </div>
           ))}
           {isAilyThinking && (
             <div className="flex justify-start animate-pulse">
-               <div className="bg-gray-100 p-2.5 rounded-xl text-[10px] text-gray-400 font-medium italic">Aily 正在深度解构业务维度...</div>
+               <div className="bg-white p-3 rounded-[var(--radius-md)] text-xs text-slate-400 font-semibold border border-gray-200 shadow-sm">Aily 正在深度解构业务维度...</div>
             </div>
           )}
           <div ref={chatEndRef} />
         </div>
 
-        <div className="p-4 border-t border-gray-100 bg-white shadow-2xl">
+        <div className="p-6 border-t border-gray-200 bg-white">
           <div className="relative">
-            <input type="text" disabled={isAilyThinking} placeholder="向 Aily 提问业务现状..." className="w-full border border-gray-200 rounded-xl py-3 pl-4 pr-10 text-[11px] focus:ring-2 focus:ring-blue-500 focus:outline-none bg-gray-50 shadow-inner transition-all" onKeyDown={(e) => { if (e.key === 'Enter') { const input = e.currentTarget; if (!input.value || isAilyThinking) return; const text = input.value; setMessages(prev => [...prev, { role: 'user', text }]); input.value = ''; askGemini(text); } }} />
-            <button className="absolute right-3 top-3 text-blue-600 hover:scale-110 transition-transform">
-              <svg className="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            <input
+              type="text"
+              disabled={isAilyThinking}
+              placeholder="向 Aily 提问业务现状..."
+              className="w-full h-11 pl-4 pr-12 text-sm bg-white border border-gray-200 rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition-all placeholder:text-slate-400 text-slate-900"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const input = e.currentTarget;
+                  if (!input.value || isAilyThinking) return;
+                  const text = input.value;
+                  setMessages(prev => [...prev, { role: 'user', text }]);
+                  input.value = '';
+                  askGemini(text);
+                }
+              }}
+            />
+            <button className="absolute right-2 top-2 bottom-2 w-8 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-gray-100 rounded-[var(--radius-sm)] transition-all" disabled={isAilyThinking}>
+              <IconSend />
             </button>
           </div>
-          <p className="mt-3 text-[9px] text-gray-300 text-center font-bold tracking-tighter uppercase italic">Gemini 3 Pro Solution Engine</p>
+          <p className="mt-4 text-[10px] text-slate-300 text-center font-bold tracking-[0.2em] uppercase">Gemini 3 Pro Solution Engine</p>
         </div>
       </aside>
     </div>

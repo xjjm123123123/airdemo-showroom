@@ -18,6 +18,7 @@ export interface Demo {
   id: string;
   title: string;
   valueProp: string;
+  cover?: string;
   points: string[];
   audience: string;
   steps: DemoStep[];
@@ -59,6 +60,16 @@ export interface McpCapability {
   name: string;
   description: string;
   tools: McpTool[];
+}
+
+export interface EfficiencyTool {
+  id: string;
+  name: string;
+  title: string;
+  url: string;
+  skills: string[];
+  highlight: string;
+  avatarUrl?: string;
 }
 
 export interface AgentProfile {
