@@ -26,7 +26,7 @@ const IconChevronDown = ({ className = '' }: { className?: string }) => (
   </svg>
 );
 
-const AI_NAVIGATOR_URL = 'https://version3-ai-vi-1-0-1.vercel.app/';
+const AI_NAVIGATOR_URL = 'https://www.ailinghangzhe.cn';
 
 const App: React.FC = () => {
   const [selectedDemo, setSelectedDemo] = useState<Demo | null>(null);
