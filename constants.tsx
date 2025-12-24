@@ -4,6 +4,8 @@ import { BusinessContext, Demo } from './types';
 const INSPECTION_IMAGE = "https://files.imagetourl.net/uploads/1766244783700-c685ecaa-ae04-455d-b39d-91ac6ab7d54a.png";
 const MECHANICAL_IMAGE = "https://files.imagetourl.net/uploads/1766245759016-b1a82b7e-adc4-438c-84b4-d4e95790c2d1.png";
 const EQUIPMENT_IMAGE = "https://files.imagetourl.net/uploads/1766248925406-a7bffe6f-cd74-4605-8298-5a197f13b881.png";
+const INSPECTION_COVER_URL = "https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%886.50.56.png";
+const GTM_COVER_URL = "https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%883.35.20.png";
 
 export const PROMPT_TEMPLATES: BusinessContext[] = [
   {
@@ -155,6 +157,7 @@ export const DEMO_LIST: Demo[] = [
   {
     id: 'gtm',
     title: 'AI GTM | Sales Intelligence',
+    cover: GTM_COVER_URL,
     valueProp: '提前发现正在流失的商机，把风险变成可执行的销售行动',
     points: ['会议纪要自动风险识别', '风险点自动同步商机表', '管理者实时风险预警'],
     audience: 'VP Sales / 销售负责人 / RevOps',
@@ -179,6 +182,7 @@ export const DEMO_LIST: Demo[] = [
   {
     id: 'inspection',
     title: 'AI 智能巡检 | EHS & 设备管理',
+    cover: INSPECTION_COVER_URL,
     valueProp: '通过 AI 视觉分析实现巡检自动判定与闭环整改',
     points: ['巡检任务自动分配', '照片/视频实时 AI 审计', '低合规项自动预警'],
     audience: '工厂负责人 / EHS 主管 / 设备部经理',

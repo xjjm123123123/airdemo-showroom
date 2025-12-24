@@ -18,6 +18,7 @@ export interface Demo {
   id: string;
   title: string;
   valueProp: string;
+  cover?: string;
   points: string[];
   audience: string;
   steps: DemoStep[];
