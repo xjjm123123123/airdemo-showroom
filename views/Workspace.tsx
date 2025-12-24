@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Prism from '../components/Prism';
+import Loading from '../components/Loading';
 import { GoogleGenAI } from "@google/genai";
 import { BusinessContext, Demo } from '../types';
 import { EFFICIENCY_TOOLS } from '../constants';
@@ -36,6 +37,7 @@ interface ColumnDef {
 
 const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) => {
   const [isAiRunning, setIsAiRunning] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(true);
 
   const baseIframeUrl = 'https://bytedance.larkoffice.com/base/Rcbrbk2qCazsPTs48TecJSIKnod?from=from_copylink';
   const baseAppIframeUrl = 'https://bytedance.larkoffice.com/app/Vv6DbpDoGawcMwszp3XcMms6nTf';
@@ -80,6 +82,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
     setEditingCell(null);
     if (currentApp !== 'demo') setBaseViewMode('app');
   }, [currentApp]);
+
+  useEffect(() => {
+    setIframeLoading(true);
+  }, [baseViewMode]);
 
   useEffect(() => {
     setEditableMainData(demo.mainTable);
@@ -441,7 +447,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
       <section className="flex-1 flex flex-col min-w-0 bg-white relative overflow-hidden order-1">
         <div className="flex-1 flex flex-col overflow-hidden bg-white">
           {currentApp === 'demo' ? (
-            <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn">
+            <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn relative">
                <div className="h-14 bg-white border-b border-gray-100 flex items-center px-6 lg:px-8 gap-6 flex-shrink-0 z-10">
                   <div className="ml-auto inline-flex rounded-[var(--radius-md)] border border-gray-200 bg-gray-50 p-1">
                     <button
@@ -460,23 +466,27 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
                </div>
                
                {baseViewMode === 'table' ? (
-                 <div className="flex-1 bg-white">
+                 <div className="flex-1 bg-white relative">
+                   {iframeLoading && <Loading />}
                    <iframe
                      src={baseIframeUrl}
                      title="Lark Base"
                      className="w-full h-full border-0"
                      allow="clipboard-read; clipboard-write; fullscreen"
                      allowFullScreen
+                     onLoad={() => setIframeLoading(false)}
                    />
                  </div>
               ) : (
-                <div className="flex-1 bg-white">
+                <div className="flex-1 bg-white relative">
+                  {iframeLoading && <Loading />}
                   <iframe
                     src={baseAppIframeUrl}
                     title="Lark App"
                     className="w-full h-full border-0"
                     allow="clipboard-read; clipboard-write; fullscreen"
                     allowFullScreen
+                    onLoad={() => setIframeLoading(false)}
                   />
                 </div>
               )}

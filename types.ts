@@ -62,6 +62,16 @@ export interface McpCapability {
   tools: McpTool[];
 }
 
+export interface EfficiencyTool {
+  id: string;
+  name: string;
+  title: string;
+  url: string;
+  skills: string[];
+  highlight: string;
+  avatarUrl?: string;
+}
+
 export interface AgentProfile {
   name: string;
   role: string;

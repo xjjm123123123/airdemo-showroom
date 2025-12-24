@@ -4,6 +4,7 @@ import Workspace from './views/Workspace';
 import DemoFlow from './views/DemoFlow';
 import Efficiency from './views/Efficiency';
 import Prism from './components/Prism';
+import TextType from './components/TextType';
 import { Demo } from './types';
 import { DEMO_LIST, EFFICIENCY_TOOLS } from './constants';
 
@@ -19,12 +20,20 @@ const IconArrowRight = () => <svg width="14" height="14" viewBox="0 0 24 24" fil
 const IconArrowUpRight = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>;
 const IconMessage = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
 const IconSend = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>;
+const IconChevronDown = ({ className = '' }: { className?: string }) => (
+  <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+const AI_NAVIGATOR_URL = 'https://version3-ai-vi-1-0-1.vercel.app/';
 
 const App: React.FC = () => {
   const [selectedDemo, setSelectedDemo] = useState<Demo | null>(null);
   const [currentApp, setCurrentApp] = useState<AppId>('home');
   const [workspaceInitialView, setWorkspaceInitialView] = useState<WorkspaceViewId>('main');
   const [demoViewMode, setDemoViewMode] = useState<'flow' | 'workspace'>('flow');
+  const [isHomeChatCollapsed, setIsHomeChatCollapsed] = useState(true);
   const [homeMessages, setHomeMessages] = useState<{ role: 'ai' | 'user'; text: string }[]>([
     { role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }
   ]);
@@ -102,9 +111,11 @@ const App: React.FC = () => {
       <header className="h-20 border-b border-[color:var(--border)] flex items-center justify-between px-6 lg:px-10 glass-panel flex-shrink-0 z-50 relative">
         <div className="flex items-center gap-4 lg:gap-8 min-w-0 flex-1">
           <div className="flex items-center gap-3 cursor-pointer group flex-shrink-0" onClick={handleGoHome}>
-            <div className="w-9 h-9 bg-[color:var(--primary)] rounded-[var(--radius-sm)] flex items-center justify-center transition-transform group-hover:scale-105 shadow-sm">
-              <span className="text-black font-bold text-sm">A</span>
-            </div>
+            <img 
+              src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/Lark_Suite_logo_2022%201_%E5%89%AF%E6%9C%AC.png" 
+              alt="Logo" 
+              className="w-9 h-9 object-contain transition-transform group-hover:scale-105" 
+            />
             <div className="flex flex-col leading-tight hidden sm:flex">
               <h1 className="font-semibold text-sm text-[color:var(--text)] tracking-tight">AirDemo</h1>
               <span className="text-[10px] font-medium text-[color:var(--text-3)] tracking-wide">Showroom</span>
@@ -134,6 +145,16 @@ const App: React.FC = () => {
                 {app.name}
               </button>
             ))}
+
+            <a
+              href={AI_NAVIGATOR_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="ui-btn ui-btn-ghost px-3 lg:px-4 h-9 gap-2 text-xs lg:text-sm whitespace-nowrap flex-shrink-0 text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)]"
+            >
+              <IconArrowUpRight />
+              AI领航者
+            </a>
           </nav>
         </div>
 
@@ -167,8 +188,14 @@ const App: React.FC = () => {
                 <section className="ui-card overflow-hidden border border-[color:var(--border)] shadow-[var(--shadow-sm)]">
                   <div className="px-8 py-10 lg:px-20 lg:py-20 relative overflow-hidden">
                     <div className="max-w-3xl relative z-10">
-                      <h2 className="text-3xl lg:text-5xl font-semibold text-[color:var(--text)] tracking-tight leading-tight">
-                        欢迎来到<br/>飞书 AI 售前样板间
+                      <h2 className="text-3xl lg:text-5xl font-semibold text-[color:var(--text)] tracking-tight leading-tight min-h-[3em]">
+                        <TextType
+                          text={['欢迎来到\n飞书 AI 售前样板间']}
+                          typingSpeed={100}
+                          cursorCharacter="|"
+                          loop={false}
+                          showCursor={true}
+                        />
                       </h2>
                       <p className="mt-4 lg:mt-6 text-base lg:text-lg text-[color:var(--text-2)] leading-relaxed max-w-2xl font-light">
                         用最短路径把客户需求翻译成方案故事线：<br/>数据结构化 → AI 洞察 → 行动闭环。
@@ -188,6 +215,15 @@ const App: React.FC = () => {
                           打开效率工具
                         </button>
                       </div>
+                    </div>
+                    
+                    {/* Decorative Image */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 h-[120%] w-[50%] hidden lg:flex items-center justify-center pointer-events-none z-0 opacity-80 mix-blend-normal">
+                      <img 
+                        src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2000_09_48.png" 
+                        alt="" 
+                        className="max-w-full max-h-full object-contain transform scale-[1.15]"
+                      />
                     </div>
                   </div>
                 </section>
@@ -311,18 +347,32 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <aside className="w-full lg:w-[360px] h-[300px] lg:h-auto border-t lg:border-t-0 lg:border-l border-[color:var(--border)] ui-card rounded-none lg:rounded-none border-0 lg:border-l flex flex-col flex-shrink-0 shadow-[var(--shadow-xl)] z-40 lg:relative absolute bottom-0 lg:bottom-auto transition-transform duration-300 transform translate-y-0 backdrop-blur-xl">
+            <aside
+              className={`w-full lg:w-[360px] h-[300px] lg:h-auto border-t lg:border-t-0 lg:border-l border-[color:var(--border)] ui-card rounded-none lg:rounded-none border-0 lg:border-l flex flex-col flex-shrink-0 shadow-[var(--shadow-xl)] z-40 lg:relative absolute bottom-0 lg:bottom-auto transition-transform duration-300 transform backdrop-blur-xl lg:translate-y-0 ${isHomeChatCollapsed ? 'translate-y-[252px]' : 'translate-y-0'}`}
+            >
               <div className="h-12 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 lg:px-6 bg-transparent">
-                <div className="flex items-center gap-2 text-sm font-bold text-[color:var(--text)]">
+                <button
+                  type="button"
+                  onClick={() => setIsHomeChatCollapsed((v) => !v)}
+                  className="flex items-center gap-2 text-sm font-bold text-[color:var(--text)] min-w-0 lg:pointer-events-none"
+                  aria-label={isHomeChatCollapsed ? '展开首页 AI 助手' : '折叠首页 AI 助手'}
+                >
                   <IconMessage />
                   <span>首页 AI 助手</span>
-                </div>
-                <button onClick={() => setHomeMessages([{ role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }])} className="ui-btn ui-btn-ghost h-8 px-3 text-xs">
-                  清空
+                  <IconChevronDown className={`lg:hidden transition-transform ${isHomeChatCollapsed ? '' : 'rotate-180'}`} />
                 </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setHomeMessages([{ role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }])}
+                    className="ui-btn ui-btn-ghost h-8 px-3 text-xs"
+                  >
+                    清空
+                  </button>
+                </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto no-scrollbar p-4 lg:p-6 space-y-4 bg-transparent">
+              <div className={`flex-1 overflow-y-auto no-scrollbar p-4 lg:p-6 space-y-4 bg-transparent ${isHomeChatCollapsed ? 'hidden lg:block' : ''}`}>
                 {homeMessages.map((m, idx) => (
                   <div key={idx} className={`flex ${m.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
                     <div className={`max-w-[90%] p-3 lg:p-4 rounded-2xl text-xs lg:text-sm leading-relaxed border shadow-[var(--shadow-sm)] ${m.role === 'ai' ? 'bg-[color:var(--surface)]/80 border-[color:var(--border)] text-[color:var(--text)] backdrop-blur-md' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
@@ -332,7 +382,7 @@ const App: React.FC = () => {
                 ))}
               </div>
 
-              <div className="p-4 lg:p-6 border-t border-[color:var(--border)] bg-transparent">
+              <div className={`p-4 lg:p-6 border-t border-[color:var(--border)] bg-transparent ${isHomeChatCollapsed ? 'hidden lg:block' : ''}`}>
                 <div className="flex flex-wrap gap-2 mb-3 lg:mb-4">
                   <button onClick={() => setHomeInput('探探')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-2 lg:px-3 text-[10px] lg:text-xs rounded-full">探探</button>
                   <button onClick={() => setHomeInput('睿睿')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-2 lg:px-3 text-[10px] lg:text-xs rounded-full">睿睿</button>

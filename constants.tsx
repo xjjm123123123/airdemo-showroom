@@ -255,6 +255,8 @@ export const EFFICIENCY_TOOLS = [
     id: 'ruirui',
     name: '睿睿',
     title: 'AI汇报复盘助手',
+    avatarUrl:
+      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.37.png',
     url: 'https://ruirui.airdemo.cn/',
     skills: ['方案金句推荐', '客户干系人及业务研究洞察', '汇报故事线及案例推荐'],
     highlight: '飞书助力顺丰打造AI世界中的顺丰速度'
@@ -263,6 +265,8 @@ export const EFFICIENCY_TOOLS = [
     id: 'tantan',
     name: '探探',
     title: 'AI客户调研助手',
+    avatarUrl:
+      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.43.png',
     url: 'https://tantan.airdemo.cn/',
     skills: ['互动式调研', '自动生成调研总结'],
     highlight: '一位参会受访的老板这样说：前一天晚上AI就把我想要关注的事项了解了，第二天内容更高效了。AI带来的体验太直观了。'
@@ -271,6 +275,8 @@ export const EFFICIENCY_TOOLS = [
     id: 'daidai',
     name: '呆呆',
     title: 'AI Demo素材助手',
+    avatarUrl:
+      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.58.png',
     url: 'https://www.feishu.cn/ai-experience',
     skills: ['一键生成demo所需定制化数据', '模拟客户真实知识库', '模拟飞阅会战略规划文档', 'base表中模拟业务数据', '搭建智能体所需提示词'],
     highlight: '一次PoV汇报，节省了半天时间准备demo相关数据'
@@ -279,6 +285,8 @@ export const EFFICIENCY_TOOLS = [
     id: 'tutu',
     name: '图图',
     title: 'AI PPT插图助手',
+    avatarUrl:
+      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.51.png',
     url: 'https://www.feishu.cn/ai-experience',
     skills: ['生成匹配飞书视觉风格的PPT配图'],
     highlight: '认养一头牛董事长徐晓波在AI大讲堂中只拍了三页，但都是AI生成配图的PPT'
@@ -287,6 +295,8 @@ export const EFFICIENCY_TOOLS = [
     id: 'cancen',
     name: '参参',
     title: 'AI故事线参谋',
+    avatarUrl:
+      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.31.png',
     url: 'https://www.feishu.cn/ai-experience',
     skills: ['方案汇报自动化给出复盘建议'],
     highlight: '发见客户讲一半电脑没电了，扣了很多分'

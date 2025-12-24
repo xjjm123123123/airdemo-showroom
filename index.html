@@ -185,7 +185,8 @@
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .animate-fadeIn { animation: fadeIn 0.2s ease-out; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar::-webkit-scrollbar { width: 0; height: 0; display: none; }
+        .no-scrollbar::-webkit-scrollbar-thumb { background: transparent; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         @media (prefers-reduced-motion: reduce) {

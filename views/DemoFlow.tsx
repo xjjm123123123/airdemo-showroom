@@ -7,6 +7,7 @@ const IconCamera = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="n
 const IconBrain = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"></path></svg>;
 const IconCheckSquare = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>;
 const IconMessageSquare = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>;
+const IconMonitor = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>;
 const IconPlay = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
 
 interface DemoFlowProps {
@@ -63,29 +64,38 @@ const FlowEdge: React.FC<{
 };
 
 const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
-  
-  // Define nodes based on demo ID
-  let nodes = [
+  const defaultNodes = [
     { id: 1, title: '全景数据采集', desc: '实时接入工厂摄像头数据流与 IoT 传感器信号', icon: <IconCamera />, x: 100, y: 300, color: 'bg-blue-500' },
     { id: 2, title: '多模态 AI 分析', desc: 'YOLOv8 + Gemini 联合分析，识别违规行为与设备隐患', icon: <IconBrain />, x: 450, y: 300, color: 'bg-purple-500' },
     { id: 3, title: '智能业务路由', desc: '基于风险等级自动分发：警告/工单/停机指令', icon: <IconCheckSquare />, x: 800, y: 300, color: 'bg-orange-500' },
     { id: 4, title: '闭环行动触达', desc: '推送飞书卡片给对应负责人，拉起应急群组', icon: <IconMessageSquare />, x: 1150, y: 300, color: 'bg-green-500' },
   ];
 
-  if (demo.id === 'gtm') {
-    nodes = [
-      { id: 1, title: '销售会议录制', desc: '飞书妙记自动录制销售沟通全过程', icon: <IconCamera />, x: 100, y: 300, color: 'bg-indigo-500' },
-      { id: 2, title: '智能风险提取', desc: 'AI 识别客户异议、预算风险与竞对信息', icon: <IconBrain />, x: 450, y: 300, color: 'bg-rose-500' },
-      { id: 3, title: 'CRM 自动同步', desc: '将风险点与关键信息自动回写至商机报表', icon: <IconCheckSquare />, x: 800, y: 300, color: 'bg-blue-500' },
-      { id: 4, title: '销售策略建议', desc: '生成针对性的销售话术与下一步行动卡片', icon: <IconMessageSquare />, x: 1150, y: 300, color: 'bg-emerald-500' },
-    ];
-  }
+  const gtmNodes = [
+    { id: 1, title: '销售会议录制', desc: '飞书妙记自动录制销售沟通全过程', icon: <IconCamera />, x: 100, y: 300, color: 'bg-indigo-500' },
+    { id: 2, title: '智能风险提取', desc: 'AI 识别客户异议、预算风险与竞对信息', icon: <IconBrain />, x: 450, y: 300, color: 'bg-rose-500' },
+    { id: 3, title: 'CRM 自动同步', desc: '将风险点与关键信息自动回写至商机报表', icon: <IconCheckSquare />, x: 800, y: 300, color: 'bg-blue-500' },
+    { id: 4, title: '销售策略建议', desc: '生成针对性的销售话术与下一步行动卡片', icon: <IconMessageSquare />, x: 1150, y: 300, color: 'bg-emerald-500' },
+  ];
+
+  const inspectionNodes = [
+    { id: 1, title: '摄像头点位输入', desc: '录入厂区点位与摄像头绑定信息，建立可追溯数据源', icon: <IconCamera />, x: 100, y: 300, color: 'bg-sky-500' },
+    { id: 2, title: '点位摄像头视频抽帧', desc: '从视频流按规则抽帧，生成可检索的图片序列', icon: <IconCamera />, x: 420, y: 300, color: 'bg-indigo-500' },
+    { id: 3, title: 'AI 识别违规', desc: '识别在岗玩手机、睡岗、5S 不合规等违规行为', icon: <IconBrain />, x: 740, y: 300, color: 'bg-purple-500' },
+    { id: 4, title: '数据录入', desc: '违规记录与字段自动入表，支持人工补充与复核', icon: <IconCheckSquare />, x: 1060, y: 300, color: 'bg-orange-500' },
+    { id: 5, title: '大屏展示', desc: '实时汇总告警与趋势，管理者在大屏一眼掌控', icon: <IconMonitor />, x: 1380, y: 300, color: 'bg-emerald-500' },
+  ];
+
+  const nodes = demo.id === 'gtm' ? gtmNodes : demo.id === 'inspection' ? inspectionNodes : defaultNodes;
+
+  const canvasMinWidth = Math.max(1500, nodes[nodes.length - 1].x + 256 + 200);
+  const canvasMinHeight = 800;
 
   return (
     <div className="flex-1 flex h-full bg-slate-50 overflow-hidden relative font-sans">
       {/* Canvas Area */}
       <div className="flex-1 relative overflow-auto bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] cursor-grab active:cursor-grabbing">
-         <div className="min-w-[1500px] min-h-[800px] relative p-20 flex items-center justify-center">
+         <div className="relative p-20 flex items-center justify-center" style={{ minWidth: canvasMinWidth, minHeight: canvasMinHeight }}>
             {/* Edges */}
             {nodes.slice(0, -1).map((node, i) => (
               <FlowEdge 
