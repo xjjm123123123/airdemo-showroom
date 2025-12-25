@@ -4,6 +4,17 @@ import Loading from '../components/Loading';
 import { GoogleGenAI } from "@google/genai";
 import { BusinessContext, Demo } from '../types';
 import { EFFICIENCY_TOOLS } from '../constants';
+import { 
+  getCheckpointList, 
+  queryCheckpointData, 
+  writeViolationRecord,
+  generateNewId,
+  getCurrentTimestamp,
+  getCurrentDate,
+  type ViolationRecord 
+} from '../services/larkBaseService';
+import { analyzeImageForViolation, formatConfidence } from '../services/aiVisionService';
+import ViolationCard from '../components/ViolationCard';
 
 type AppId = 'home' | 'demo' | 'efficiency';
 type ViewId = 'main' | 'management' | 'equipment' | 'factory';
@@ -67,10 +78,16 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
   const [newColType, setNewColType] = useState<FieldType>('text');
 
   // Bot Chat Messages
-  const [messages, setMessages] = useState<{role: 'ai' | 'user', text: string}[]>([]);
+  const [messages, setMessages] = useState<{role: 'ai' | 'user', text?: string, card?: any}[]>([]);
   const [isAilyThinking, setIsAilyThinking] = useState(false);
   const [activeBusinessContext, setActiveBusinessContext] = useState<BusinessContext | null>(null);
   
+  // Inspection Analysis State
+  const [selectedCheckpoint, setSelectedCheckpoint] = useState<string>('');
+  const [checkpointList, setCheckpointList] = useState<string[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState<string>('');
+
   const chatEndRef = useRef<HTMLDivElement>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const bottomScrollbarRef = useRef<HTMLDivElement>(null);
@@ -88,6 +105,18 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
   useEffect(() => {
     setIframeLoading(true);
   }, [baseViewMode]);
+
+  // Load checkpoint list
+  useEffect(() => {
+    const loadCheckpoints = async () => {
+      const list = await getCheckpointList();
+      setCheckpointList(list);
+      if (list.length > 0) {
+        setSelectedCheckpoint(list[0]);
+      }
+    };
+    loadCheckpoints();
+  }, []);
 
   useEffect(() => {
     setEditableMainData(demo.mainTable);
@@ -294,6 +323,150 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
   const deleteColumn = (key: string) => {
     if (key === 'id') return;
     setColumns(columns.filter(c => c.key !== key));
+  };
+
+  /**
+   * 执行 AI 巡检分析流程
+   * 1. 显示思考过程
+   * 2. 调用工作流进行人员违规判断
+   * 3. 输出卡片式结果
+   */
+  const executeInspectionAnalysis = async () => {
+    if (!selectedCheckpoint) {
+      setMessages(prev => [...prev, { role: 'ai', text: '请先选择一个点位进行分析。' }]);
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setMessages(prev => [...prev, { role: 'user', text: `开始巡检分析：${selectedCheckpoint}` }]);
+
+    try {
+      // 显示"正在思考并生成答案..."标题
+      setMessages(prev => [...prev, { 
+        role: 'ai', 
+        text: '正在思考并生成答案...' 
+      }]);
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Step 1: 调用人员违规判断工作流
+      setAnalysisStep('调用人员违规判断工作流');
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = {
+          role: 'ai',
+          text: '正在思考并生成答案...\n\n调用人员违规判断工作流'
+        };
+        return newMessages;
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Step 2: 正在查询点位图像数据
+      setAnalysisStep('正在查询点位图像数据');
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = {
+          role: 'ai',
+          text: '正在思考并生成答案...\n\n正在查询点位图像数据'
+        };
+        return newMessages;
+      });
+      
+      const checkpointData = await queryCheckpointData(selectedCheckpoint);
+      
+      if (!checkpointData) {
+        setMessages(prev => [...prev, { role: 'ai', text: `未找到点位「${selectedCheckpoint}」的数据，请检查数据源。` }]);
+        setIsAnalyzing(false);
+        setAnalysisStep('');
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Step 3: 正在进行 AI 视觉分析
+      setAnalysisStep('正在进行 AI 视觉分析');
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = {
+          role: 'ai',
+          text: '正在思考并生成答案...\n\n正在进行 AI 视觉分析'
+        };
+        return newMessages;
+      });
+
+      const analysisResult = await analyzeImageForViolation(checkpointData.图像, selectedCheckpoint);
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Step 4: 输出卡片
+      const currentDate = getCurrentDate();
+      const currentTime = getCurrentTimestamp();
+
+      // 移除思考过程，添加结果卡片
+      setMessages(prev => {
+        const newMessages = prev.slice(0, -1); // 移除思考过程消息
+        return [
+          ...newMessages,
+          {
+            role: 'ai',
+            card: {
+              type: 'violation' as const,
+              data: {
+                imageUrl: checkpointData.图像,
+                violationType: analysisResult.violationType,
+                confidence: analysisResult.confidence,
+                description: analysisResult.description,
+                location: selectedCheckpoint,
+                department: analysisResult.suggestedDepartment,
+                date: currentDate,
+                time: currentTime,
+              }
+            }
+          }
+        ];
+      });
+
+      // Step 5: 写入违规记录（如果有违规）
+      if (analysisResult.violationType !== '无违规') {
+        const newIdNum = generateNewId(editableMainData);
+        
+        const newRecord: ViolationRecord = {
+          编号: newIdNum,
+          日期: currentDate,
+          抓取时间: currentTime,
+          位置: selectedCheckpoint,
+          违规情况: analysisResult.violationType,
+          部门: analysisResult.suggestedDepartment,
+          违规记录: checkpointData.图像,
+          AI生成: '是'
+        };
+        
+        await writeViolationRecord(newRecord);
+        
+        // 刷新表格数据（如果当前视图是主视图）
+        if (currentView === 'main') {
+          const tableRecord = {
+            id: String(newIdNum),
+            编号: String(newIdNum),
+            日期: currentDate,
+            违规情况: analysisResult.violationType,
+            违规记录: checkpointData.图像,
+            抓取时间: currentTime,
+            位置: selectedCheckpoint,
+            部门: analysisResult.suggestedDepartment
+          };
+          setEditableMainData(prev => [tableRecord, ...prev]);
+        }
+      }
+
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      setMessages(prev => [...prev, { role: 'ai', text: '分析过程中发生错误，请重试。' }]);
+    } finally {
+      setIsAnalyzing(false);
+      setAnalysisStep('');
+    }
   };
 
   const askGemini = async (question: string, context?: BusinessContext) => {
@@ -614,11 +787,58 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
               <button onClick={() => setMessages([])} className="text-xs font-medium text-[color:var(--text-3)] hover:text-[color:var(--text)] px-2 py-1 rounded hover:bg-[color:var(--bg-surface-2)] transition-colors">清空</button>
             </div>
 
+            {/* Inspection Control Panel */}
+            <div className="px-6 py-4 bg-[color:var(--bg-surface-2)] border-b border-[color:var(--border)] space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-[color:var(--text-3)] mb-1.5 block">选择巡检点位</label>
+                <div className="relative">
+                  <select 
+                    value={selectedCheckpoint}
+                    onChange={(e) => setSelectedCheckpoint(e.target.value)}
+                    disabled={isAnalyzing}
+                    className="w-full h-9 pl-3 pr-8 text-sm bg-[color:var(--bg-surface-1)] border border-[color:var(--border)] rounded-[var(--radius-md)] appearance-none focus:outline-none focus:ring-2 focus:ring-[color:var(--primary)]/20 focus:border-[color:var(--primary)] transition-all text-[color:var(--text-3)]"
+                  >
+                    {checkpointList.map(cp => (
+                      <option key={cp} value={cp}>{cp}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--text-3)] pointer-events-none">
+                    <IconChevronDown />
+                  </div>
+                </div>
+              </div>
+              
+              <button
+                onClick={executeInspectionAnalysis}
+                disabled={isAnalyzing || !selectedCheckpoint}
+                className={`w-full h-9 flex items-center justify-center gap-2 text-sm font-medium rounded-[var(--radius-md)] transition-all ${
+                  isAnalyzing || !selectedCheckpoint
+                    ? 'bg-[color:var(--bg-surface-3)] text-[color:var(--text-3)] cursor-not-allowed'
+                    : 'bg-[color:var(--primary)] text-white hover:bg-[color:var(--primary-hover)] shadow-sm hover:shadow'
+                }`}
+              >
+                {isAnalyzing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>{analysisStep || '分析中...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <IconZap />
+                    <span>执行智能巡检</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             <div className="flex-1 overflow-y-auto p-6 space-y-5 no-scrollbar bg-[color:var(--bg-surface-1)]">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'} animate-fadeIn`}>
                   <div className={`max-w-[90%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm border ${msg.role === 'ai' ? 'bg-[color:var(--bg-surface-2)] border-[color:var(--border)] text-[color:var(--text)]' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
-                    {msg.text}
+                    {msg.text && <div className="whitespace-pre-wrap">{msg.text}</div>}
+                    {msg.card && msg.card.type === 'violation' && (
+                      <ViolationCard {...msg.card.data} />
+                    )}
                   </div>
                 </div>
               ))}
