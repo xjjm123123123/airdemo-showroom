@@ -9,13 +9,13 @@ interface FeishuCardProps {
 
 const FeishuCard: React.FC<FeishuCardProps> = ({ title, fields, actions }) => {
   return (
-    <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden w-full max-w-[320px] transition-all transform hover:scale-[1.02]">
+    <div className="bg-[color:var(--bg-surface-1)] rounded-lg shadow-2xl border border-[color:var(--border)] overflow-hidden w-full max-w-[320px] transition-all transform hover:scale-[1.02]">
       {/* Header */}
-      <div className="h-1 bg-blue-500"></div>
-      <div className="p-4 border-b border-gray-50">
-        <h4 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-          <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
-             <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+      <div className="h-1 bg-[color:var(--primary)]"></div>
+      <div className="p-4 border-b border-[color:var(--border)]">
+        <h4 className="font-bold text-[color:var(--text)] text-sm flex items-center gap-2">
+          <div className="w-4 h-4 bg-[color:var(--primary-light)] rounded flex items-center justify-center">
+             <div className="w-2 h-2 bg-[color:var(--primary)] rounded-full"></div>
           </div>
           {title}
         </h4>
@@ -25,21 +25,21 @@ const FeishuCard: React.FC<FeishuCardProps> = ({ title, fields, actions }) => {
       <div className="p-4 space-y-3">
         {fields.map((f, i) => (
           <div key={i} className="flex flex-col gap-0.5">
-            <span className="text-[10px] text-gray-400 font-medium">{f.label}</span>
-            <span className="text-xs text-gray-700 font-semibold">{f.value}</span>
+            <span className="text-[10px] text-[color:var(--text-3)] font-medium">{f.label}</span>
+            <span className="text-xs text-[color:var(--text-2)] font-semibold">{f.value}</span>
           </div>
         ))}
       </div>
 
       {/* Actions */}
-      <div className="p-3 bg-gray-50 flex gap-2 border-t border-gray-100">
+      <div className="p-3 bg-[color:var(--bg-surface-2)] flex gap-2 border-t border-[color:var(--border)]">
         {actions.map((a, i) => (
           <button 
             key={i}
             className={`flex-1 py-1.5 text-xs font-bold rounded transition-colors ${
               a.primary 
-                ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
+                ? 'bg-[color:var(--primary)] text-white hover:bg-[color:var(--primary-hover)]' 
+                : 'bg-[color:var(--bg-surface-1)] border border-[color:var(--border)] text-[color:var(--text-2)] hover:bg-[color:var(--bg-surface-2)]'
             }`}
           >
             {a.label}
