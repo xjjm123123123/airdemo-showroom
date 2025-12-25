@@ -462,7 +462,11 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
       const checkpointData = await queryCheckpointData(selectedCheckpoint);
       
       if (!checkpointData) {
-        setMessages(prev => [...prev, { role: 'ai', text: `未找到点位「${selectedCheckpoint}」的数据，请检查数据源。` }]);
+        // 移除思考过程消息
+        setMessages(prev => {
+          const newMessages = prev.slice(0, -1);
+          return [...newMessages, { role: 'ai', text: `未找到点位「${selectedCheckpoint}」的数据，请检查数据源。` }];
+        });
         setIsAnalyzing(false);
         setAnalysisStep('');
         return;
@@ -527,9 +531,11 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
           AI生成: `AI识别，置信度${confidenceStr}`,
         };
 
+        console.log('📝 准备写入违规记录:', newRecord);
         const writeSuccess = await writeViolationRecord(newRecord);
 
         if (writeSuccess) {
+          console.log('✅ 违规记录写入成功');
           // 同步更新本地数据
           setEditableMainData(prev => [...prev, {
             id: `NEW-${Date.now()}`,
@@ -540,12 +546,22 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
             role: 'ai', 
             text: `✅ 违规记录已自动写入「人员违规数据表」`
           }]);
+        } else {
+          console.warn('⚠️ 违规记录写入失败（可能是演示模式或网络问题）');
+          setMessages(prev => [...prev, { 
+            role: 'ai', 
+            text: `⚠️ 分析完成，但写入多维表格失败（可能是演示模式或网络问题）`
+          }]);
         }
       }
 
     } catch (error) {
-      console.error('巡检分析失败:', error);
-      setMessages(prev => [...prev, { role: 'ai', text: '❌ 分析过程中发生错误，请检查网络连接后重试。' }]);
+      console.error('❌ 巡检分析失败:', error);
+      // 移除思考过程消息
+      setMessages(prev => {
+        const newMessages = prev.slice(0, -1);
+        return [...newMessages, { role: 'ai', text: `❌ 分析过程中发生错误：${error instanceof Error ? error.message : '未知错误'}` }];
+      });
     } finally {
       setIsAnalyzing(false);
       setAnalysisStep('');
