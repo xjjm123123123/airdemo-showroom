@@ -33,10 +33,12 @@ interface WebhookResponse {
 
 // 配置 - Webhook URL（使用代理路径绕过 CORS）
 const CONFIG = {
+  // 查询点位数据的 Webhook（可选，不配置则使用模拟数据）
+  QUERY_CHECKPOINT_WEBHOOK: (import.meta as any).env?.VITE_QUERY_CHECKPOINT_WEBHOOK || '',
   // 写入违规记录的 Webhook
-  // 原始 URL: https://bytedance.larkoffice.com/base/automation/webhook/event/Oo1MaNfsZwEpMMhIMGBcQEIqnYb
-  // 通过 Vite 代理: /api/webhook/event/Oo1MaNfsZwEpMMhIMGBcQEIqnYb
-  WRITE_VIOLATION_WEBHOOK: '/api/webhook/event/Oo1MaNfsZwEpMMhIMGBcQEIqnYb',
+  // 开发环境使用代理: /api/webhook/event/Oo1MaNfsZwEpMMhIMGBcQEIqnYb
+  // 生产环境使用完整 URL（需要配置 VITE_WRITE_VIOLATION_WEBHOOK）
+  WRITE_VIOLATION_WEBHOOK: (import.meta as any).env?.VITE_WRITE_VIOLATION_WEBHOOK || '/api/webhook/event/Oo1MaNfsZwEpMMhIMGBcQEIqnYb',
 };
 
 /**
@@ -96,8 +98,13 @@ export const queryCheckpointData = async (checkpoint: string): Promise<Checkpoin
  * @returns 是否成功
  */
 export const writeViolationRecord = async (record: ViolationRecord): Promise<boolean> => {
+  console.log('📝 [writeViolationRecord] 开始写入违规记录');
+  console.log('📦 记录内容:', record);
+  console.log('🔧 Webhook URL:', CONFIG.WRITE_VIOLATION_WEBHOOK);
+  
   // 演示模式：模拟写入成功
   if (!CONFIG.WRITE_VIOLATION_WEBHOOK) {
+    console.log('⚠️ [演示模式] 未配置 Webhook URL，使用演示模式');
     console.log('📝 [演示模式] 写入违规记录:', record);
     return true;
   }
@@ -131,6 +138,8 @@ export const writeViolationRecord = async (record: ViolationRecord): Promise<boo
       body: JSON.stringify(requestBody),
     });
 
+    console.log('📨 响应状态:', response.status, response.statusText);
+
     // 飞书 Webhook 可能返回空响应或简单状态
     if (response.ok) {
       console.log('✅ Webhook 请求成功');
@@ -139,9 +148,16 @@ export const writeViolationRecord = async (record: ViolationRecord): Promise<boo
 
     const result = await response.text();
     console.log('📥 Webhook 响应:', result);
-    return response.ok;
+    console.warn('⚠️ Webhook 返回非 2xx 状态码:', response.status);
+    return false;
   } catch (error) {
     console.error('❌ 写入违规记录失败:', error);
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      console.error('💡 提示：可能是 CORS 跨域问题或网络连接失败');
+      console.error('💡 解决方案：');
+      console.error('   1. 在生产环境配置后端代理服务');
+      console.error('   2. 或使用演示模式（不写入真实数据）');
+    }
     return false;
   }
 };

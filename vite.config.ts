@@ -6,13 +6,24 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
       server: {
-        port: 3000,
-        host: '0.0.0.0',
+        port: 8080,
+        host: 'localhost',
+        strictPort: true,
+        // 代理配置，解决 CORS 跨域问题
+        proxy: {
+          '/api/webhook': {
+            target: 'https://bytedance.larkoffice.com',
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/api\/webhook/, '/base/automation/webhook'),
+            secure: true,
+          },
+        },
       },
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.GEMINI_BASE_URL': JSON.stringify(env.GEMINI_BASE_URL)
       },
       resolve: {
         alias: {
