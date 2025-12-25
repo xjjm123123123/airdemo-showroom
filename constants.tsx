@@ -162,10 +162,13 @@ export const DEMO_LIST: Demo[] = [
     points: ['会议纪要自动风险识别', '风险点自动同步商机表', '管理者实时风险预警'],
     audience: 'VP Sales / 销售负责人 / RevOps',
     steps: [
-      { id: 1, title: '查看销售会议', component: '妙记 (Minutes)', script: '“首先，我们进入飞书妙记查看昨天的客户访谈，AI已经自动总结了核心要点。”', value: '分钟级获取会议核心，不漏掉关键信息', fallback: '若妙记加载慢，直接展示旁边的文字摘要' },
-      { id: 2, title: 'AI 风险识别', component: 'Aily / Insight', script: '“注意到右侧，AI识别出客户对价格预算存在极高异议，且决策链路发生变动。”', value: '自动化专家级风险分析，无需人工复盘', fallback: '直接读取预设好的高风险项' },
-      { id: 3, title: '写入商机看板', component: 'Base 表格', script: '“风险点实时回写到我们的商机漏斗表中，看板状态已变为红色警告。”', value: '数据一致性，消除信息孤岛', fallback: '手动刷新表格演示状态变更' },
-      { id: 4, title: '下发行动指令', component: 'Bot 卡片', script: '“AI自动为销售总监生成了一条建议卡片：建议本周四邀约客户VP进行高层对标。”', value: '从洞察到行动的闭环', fallback: '展示预设的Bot消息历史' }
+      { id: 1, title: '获客阶段 - 探探', component: '探探', script: '可用于市场调研和客户需求分析，实现规模化调研一线用户，节省调研纪要整理时间', value: '实现规模化调研一线用户', fallback: '' },
+      { id: 2, title: '商机阶段 - 参参', component: '参参', script: '提供方案金句推荐、客户干系人及业务研究洞察、汇报故事线及案例推荐，加速客户FP汇报准备', value: '加速客户FP汇报准备', fallback: '' },
+      { id: 3, title: '商机阶段 - 呆呆', component: '呆呆', script: '一键生成demo所需定制化数据，提升准备汇报的效率', value: '提升准备汇报的效率', fallback: '' },
+      { id: 4, title: '商机阶段 - 图图', component: '图图', script: '生成匹配飞书视觉风格的PPT配图，提升方案展示效果', value: '提升方案展示效果', fallback: '' },
+      { id: 5, title: '签约阶段 - 蕊蕊', component: '蕊蕊', script: '对方案汇报进行复盘，给出改进建议，提升销售团队整体水平', value: '提升销售团队整体水平', fallback: '' },
+      { id: 6, title: '用户反馈 - 探探', component: '探探', script: '可用于收集和分析用户反馈，帮助运营团队更好地了解客户需求', value: '帮助运营团队更好地了解客户需求', fallback: '' },
+      { id: 7, title: '客户培训 - 参参', component: '参参', script: '为客户提供培训内容和案例推荐，提升客户满意度和忠诚度', value: '提升客户满意度和忠诚度', fallback: '' }
     ],
     mainTable: [
       { id: 'OPP-001', name: '某跨国零售数字化转型', owner: '张三', stage: '需求确认', risk: '无', budget: '100w' },
@@ -253,7 +256,7 @@ export const DEMO_LIST: Demo[] = [
 export const EFFICIENCY_TOOLS = [
   {
     id: 'ruirui',
-    name: '睿睿',
+    name: '蕊蕊',
     title: 'AI汇报复盘助手',
     avatarUrl:
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.37.png',
@@ -277,7 +280,7 @@ export const EFFICIENCY_TOOLS = [
     title: 'AI Demo素材助手',
     avatarUrl:
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.58.png',
-    url: 'https://www.feishu.cn/ai-experience',
+    url: 'https://aily.feishu.cn/agents/agent_4j12fz05we0z7',
     skills: ['一键生成demo所需定制化数据', '模拟客户真实知识库', '模拟飞阅会战略规划文档', 'base表中模拟业务数据', '搭建智能体所需提示词'],
     highlight: '一次PoV汇报，节省了半天时间准备demo相关数据'
   },
@@ -287,7 +290,7 @@ export const EFFICIENCY_TOOLS = [
     title: 'AI PPT插图助手',
     avatarUrl:
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.51.png',
-    url: 'https://www.feishu.cn/ai-experience',
+    url: 'https://bytedance.larkoffice.com/app/PwQtb3EjOa4nIOsgtnBcxeMQnud?chunked=false&pageId=pgepRQZvt4TG14Kb',
     skills: ['生成匹配飞书视觉风格的PPT配图'],
     highlight: '认养一头牛董事长徐晓波在AI大讲堂中只拍了三页，但都是AI生成配图的PPT'
   },
@@ -297,7 +300,7 @@ export const EFFICIENCY_TOOLS = [
     title: 'AI故事线参谋',
     avatarUrl:
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.31.png',
-    url: 'https://www.feishu.cn/ai-experience',
+    url: 'https://bytedance.larkoffice.com/share/base/form/shrcn5qfPJUyu3YJwTmWz0idEbf',
     skills: ['方案汇报自动化给出复盘建议'],
     highlight: '发见客户讲一半电脑没电了，扣了很多分'
   }

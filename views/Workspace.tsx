@@ -22,6 +22,7 @@ const IconArrowUpRight = () => <svg width="12" height="12" viewBox="0 0 24 24" f
 const IconMessage = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
 const IconSend = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>;
 const IconGrid = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
+const IconChevronDown = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>;
 
 interface WorkspaceProps {
   demo: Demo;
@@ -38,6 +39,7 @@ interface ColumnDef {
 const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) => {
   const [isAiRunning, setIsAiRunning] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
+  const [expandedStages, setExpandedStages] = useState<Record<string, boolean>>({});
 
   const baseIframeUrl = 'https://bytedance.larkoffice.com/base/Rcbrbk2qCazsPTs48TecJSIKnod?from=from_copylink';
   const baseAppIframeUrl = 'https://bytedance.larkoffice.com/app/Vv6DbpDoGawcMwszp3XcMms6nTf';
@@ -340,20 +342,20 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
 
   const getHeaderIcon = (type: FieldType) => {
     switch(type) {
-      case 'number': return <span className="text-blue-500 mr-2"><IconHash /></span>;
-      case 'select': return <span className="text-orange-400 mr-2"><IconList /></span>;
-      case 'image': return <span className="text-purple-400 mr-2"><IconImage /></span>;
-      default: return <span className="text-gray-400 mr-2"><IconType /></span>;
+      case 'number': return <span className="text-[color:var(--primary)] mr-2"><IconHash /></span>;
+      case 'select': return <span className="text-[color:var(--warning)] mr-2"><IconList /></span>;
+      case 'image': return <span className="text-[color:var(--purple)] mr-2"><IconImage /></span>;
+      default: return <span className="text-[color:var(--text-3)] mr-2"><IconType /></span>;
     }
   };
 
   const getPillColor = (value: string) => {
     const v = String(value).trim();
-    if (!v) return 'bg-gray-50 text-gray-300 border-gray-100';
-    if (['高', '不合规', '紧急', '进行中', '在岗玩手机', '睡岗', '走路玩手机'].includes(v)) return 'bg-red-50 text-red-600 border-red-100';
-    if (['无', '合规', '已完成', '已交付', '生产部'].includes(v)) return 'bg-green-50 text-green-600 border-green-100';
-    if (['处理中', '中', 'AI识别结论', '不符合5s标准', '机械工艺师'].includes(v)) return 'bg-blue-50 text-blue-600 border-blue-100';
-    return 'bg-gray-50 text-gray-600 border-gray-100';
+    if (!v) return 'bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] border-[color:var(--border)]';
+    if (['高', '不合规', '紧急', '进行中', '在岗玩手机', '睡岗', '走路玩手机'].includes(v)) return 'bg-[color:var(--danger-bg)] text-[color:var(--danger)] border-[color:var(--danger-border)]';
+    if (['无', '合规', '已完成', '已交付', '生产部'].includes(v)) return 'bg-[color:var(--success-bg)] text-[color:var(--success)] border-[color:var(--success-border)]';
+    if (['处理中', '中', 'AI识别结论', '不符合5s标准', '机械工艺师'].includes(v)) return 'bg-[color:var(--primary-bg)] text-[color:var(--primary)] border-[color:var(--primary-border)]';
+    return 'bg-[color:var(--bg-surface-2)] text-[color:var(--text-2)] border-[color:var(--border)]';
   };
 
   const appImageColumn = columns.find((c) => c.type === 'image' && c.key !== 'id');
@@ -443,54 +445,68 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
   };
 
   return (
-    <div className="h-full w-full flex flex-col lg:flex-row overflow-hidden bg-white font-sans relative text-slate-900">
-      <section className="flex-1 flex flex-col min-w-0 bg-white relative overflow-hidden order-1">
-        <div className="flex-1 flex flex-col overflow-hidden bg-white">
+    <div className="h-full w-full flex flex-col lg:flex-row overflow-hidden bg-[color:var(--bg-body)] font-sans relative text-[color:var(--text)]">
+      <section className="flex-1 flex flex-col min-w-0 bg-[color:var(--bg-body)] relative overflow-hidden order-1">
+        <div className="flex-1 flex flex-col overflow-hidden bg-[color:var(--bg-body)]">
           {currentApp === 'demo' ? (
-            <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn relative">
-               <div className="h-14 bg-white border-b border-gray-100 flex items-center px-6 lg:px-8 gap-6 flex-shrink-0 z-10">
-                  <div className="ml-auto inline-flex rounded-[var(--radius-md)] border border-gray-200 bg-gray-50 p-1">
+            demo.id === 'gtm' ? (
+              <div className="flex-1 bg-[color:var(--bg-body)] relative">
+                {iframeLoading && <Loading />}
+                <iframe
+                  src="https://bytedance.larkoffice.com/base/JRAkbvyCbag90QsDAhicKriBnZe?table=tblYiXmzqwotHNwg&view=vewwHwSIUN"
+                  title="Lark Base"
+                  className="w-full h-full border-0"
+                  allow="clipboard-read; clipboard-write; fullscreen"
+                  allowFullScreen
+                  onLoad={() => setIframeLoading(false)}
+                />
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col overflow-hidden animate-fadeIn relative">
+                <div className="h-14 bg-[color:var(--bg-body)] border-b border-[color:var(--border)] flex items-center px-6 lg:px-8 gap-6 flex-shrink-0 z-10">
+                  <div className="ml-auto inline-flex rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--bg-surface-1)] p-1">
                     <button
                       onClick={() => setBaseViewMode('table')}
-                      className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${baseViewMode === 'table' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-900'}`}
+                      className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${baseViewMode === 'table' ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] shadow-sm ring-1 ring-black/5' : 'text-[color:var(--text-3)] hover:text-[color:var(--text)]'}`}
                     >
                       多维表格
                     </button>
                     <button
                       onClick={() => setBaseViewMode('app')}
-                      className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${baseViewMode === 'app' ? 'bg-white text-slate-900 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-900'}`}
+                      className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${baseViewMode === 'app' ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] shadow-sm ring-1 ring-black/5' : 'text-[color:var(--text-3)] hover:text-[color:var(--text)]'}`}
                     >
                       应用模式
                     </button>
                   </div>
-               </div>
-               
-               {baseViewMode === 'table' ? (
-                 <div className="flex-1 bg-white relative">
-                   {iframeLoading && <Loading />}
-                   <iframe
-                     src={baseIframeUrl}
-                     title="Lark Base"
-                     className="w-full h-full border-0"
-                     allow="clipboard-read; clipboard-write; fullscreen"
-                     allowFullScreen
-                     onLoad={() => setIframeLoading(false)}
-                   />
-                 </div>
-              ) : (
-                <div className="flex-1 bg-white relative">
-                  {iframeLoading && <Loading />}
-                  <iframe
-                    src={baseAppIframeUrl}
-                    title="Lark App"
-                    className="w-full h-full border-0"
-                    allow="clipboard-read; clipboard-write; fullscreen"
-                    allowFullScreen
-                    onLoad={() => setIframeLoading(false)}
-                  />
                 </div>
-              )}
-            </div>
+                
+                {baseViewMode === 'table' ? (
+                  <div className="flex-1 bg-[color:var(--bg-body)] relative">
+                    {iframeLoading && <Loading />}
+                    <iframe
+                      src={baseIframeUrl}
+                      title="Lark Base"
+                      className="w-full h-full border-0"
+                      allow="clipboard-read; clipboard-write; fullscreen"
+                      allowFullScreen
+                      onLoad={() => setIframeLoading(false)}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 bg-[color:var(--bg-body)] relative">
+                    {iframeLoading && <Loading />}
+                    <iframe
+                      src={baseAppIframeUrl}
+                      title="Lark App"
+                      className="w-full h-full border-0"
+                      allow="clipboard-read; clipboard-write; fullscreen"
+                      allowFullScreen
+                      onLoad={() => setIframeLoading(false)}
+                    />
+                  </div>
+                )}
+              </div>
+            )
           ) : (
             <div className="flex-1 flex items-center justify-center text-[color:var(--text-3)] flex-col gap-4">
               <div className="text-6xl opacity-10 grayscale">
@@ -503,64 +519,142 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
       </section>
 
       {/* 3. AILY SIDEBAR */}
-      <aside className="w-full lg:w-[360px] h-[35vh] lg:h-auto border-t lg:border-t-0 lg:border-l border-gray-200 bg-gray-50/50 flex flex-col flex-shrink-0 z-50 shadow-xl relative order-2">
-        <div className="h-14 lg:h-16 border-b border-gray-200 flex items-center justify-between px-6 bg-white sticky top-0 z-10">
-           <div className="flex flex-col min-w-0">
-             <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-               <div className="w-6 h-6 bg-slate-900 rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm text-white">
-                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
-               </div>
-               Aily 分析工作台
-             </h4>
-             {activeBusinessContext && (
-               <div className="text-[10px] font-semibold text-slate-400 tracking-tight truncate mt-1">
-                 当前上下文：{activeBusinessContext.title}
-               </div>
-             )}
-           </div>
-           <button onClick={() => setMessages([])} className="text-xs font-medium text-slate-400 hover:text-slate-900 px-2 py-1 rounded hover:bg-gray-100 transition-colors">清空</button>
-        </div>
+      <aside className="w-full lg:w-[360px] h-[35vh] lg:h-auto border-t lg:border-t-0 lg:border-l border-[color:var(--border)] bg-[color:var(--bg-surface-1)] flex flex-col flex-shrink-0 z-50 shadow-xl relative order-2">
+        {demo.id === 'gtm' ? (
+          <div className="flex flex-col h-full">
+            <div className="h-14 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-6 bg-[color:var(--bg-surface-1)] sticky top-0 z-10">
+              <h4 className="text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest flex items-center gap-2">
+                <div className="w-6 h-6 bg-[color:var(--primary)] rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm text-white">
+                  <IconGrid />
+                </div>
+                Agent 工具栈
+              </h4>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[color:var(--bg-surface-1)]">
+              {(() => {
+                const groupedSteps = demo.steps.reduce((acc, step) => {
+                  const stage = step.title.split(' - ')[0];
+                  if (!acc[stage]) {
+                    acc[stage] = [];
+                  }
+                  acc[stage].push(step);
+                  return acc;
+                }, {} as Record<string, typeof demo.steps>);
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-5 no-scrollbar bg-gray-50">
-          {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'} animate-fadeIn`}>
-              <div className={`max-w-[90%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm border ${msg.role === 'ai' ? 'bg-white border-gray-200 text-slate-800' : 'bg-slate-900 border-transparent text-white'}`}>
-                {msg.text}
+                return Object.entries(groupedSteps).map(([stage, steps]) => {
+                  const typedSteps = steps as typeof demo.steps;
+                  const isExpanded = expandedStages[stage] !== false;
+                  return (
+                    <div key={stage} className="mb-2">
+                      <div 
+                        className="flex items-center justify-between py-2 cursor-pointer hover:bg-[color:var(--bg-surface-2)] rounded-lg px-2 -mx-2 select-none"
+                        onClick={() => setExpandedStages(prev => ({ ...prev, [stage]: !isExpanded }))}
+                      >
+                        <h5 className="text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest">{stage}</h5>
+                        <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''} text-[color:var(--text-3)]`}>
+                          <IconChevronDown />
+                        </div>
+                      </div>
+                      
+                      <div className={`space-y-4 overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[1000px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                        {typedSteps.map((step) => {
+                          const tool = EFFICIENCY_TOOLS.find(t => t.name === step.component);
+                          return (
+                            <div 
+                              key={step.id} 
+                              className="p-4 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-surface-2)] hover:border-[color:var(--primary)] transition-all cursor-pointer group flex gap-3"
+                              onClick={() => tool?.url && window.open(tool.url, '_blank')}
+                            >
+                              <div className="w-10 h-10 rounded-full bg-[color:var(--bg-surface-1)] border border-[color:var(--border)] flex-shrink-0 overflow-hidden">
+                                {tool?.avatarUrl ? (
+                                  <img src={tool.avatarUrl} alt={step.component} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-[color:var(--text-3)]">
+                                    <IconZap />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-sm font-bold text-[color:var(--text)]">{step.component}</span>
+                                </div>
+                                <p className="text-xs text-[color:var(--text-3)] line-clamp-2 group-hover:text-[color:var(--text-2)] transition-colors">{step.script}</p>
+                              </div>
+                              {tool?.url && (
+                                <div className="flex items-center justify-center text-[color:var(--text-3)] group-hover:text-[color:var(--primary)]">
+                                  <IconArrowUpRight />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="h-14 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-6 bg-[color:var(--bg-surface-1)] sticky top-0 z-10">
+              <div className="flex flex-col min-w-0">
+                <h4 className="text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest flex items-center gap-2">
+                  <div className="w-6 h-6 bg-[color:var(--primary)] rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm text-white">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+                  </div>
+                  Aily 分析工作台
+                </h4>
+                {activeBusinessContext && (
+                  <div className="text-[10px] font-semibold text-[color:var(--text-3)] tracking-tight truncate mt-1">
+                    当前上下文：{activeBusinessContext.title}
+                  </div>
+                )}
+              </div>
+              <button onClick={() => setMessages([])} className="text-xs font-medium text-[color:var(--text-3)] hover:text-[color:var(--text)] px-2 py-1 rounded hover:bg-[color:var(--bg-surface-2)] transition-colors">清空</button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 no-scrollbar bg-[color:var(--bg-surface-1)]">
+              {messages.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'} animate-fadeIn`}>
+                  <div className={`max-w-[90%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm border ${msg.role === 'ai' ? 'bg-[color:var(--bg-surface-2)] border-[color:var(--border)] text-[color:var(--text)]' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              {isAilyThinking && (
+                <div className="flex justify-start animate-pulse">
+                  <div className="bg-[color:var(--bg-surface-2)] p-3 rounded-[var(--radius-md)] text-xs text-[color:var(--text-3)] font-semibold border border-[color:var(--border)] shadow-sm">Aily 正在深度解构业务维度...</div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            <div className="p-6 border-t border-[color:var(--border)] bg-[color:var(--bg-surface-1)]">
+              <div className="relative">
+                <input
+                  type="text"
+                  disabled={isAilyThinking}
+                  placeholder="向 Aily 提问业务现状..."
+                  className="w-full h-11 pl-4 pr-12 text-sm bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-[color:var(--primary)]/20 focus:border-[color:var(--primary)] transition-all placeholder:text-[color:var(--text-3)] text-[color:var(--text)]"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const input = e.currentTarget;
+                      if (!input.value || isAilyThinking) return;
+                      const text = input.value;
+                      setMessages(prev => [...prev, { role: 'user', text }]);
+                      input.value = '';
+                      askGemini(text);
+                    }
+                  }}
+                />
+                <button className="absolute right-2 top-2 bottom-2 w-8 flex items-center justify-center text-[color:var(--text:var(--text-3)] hover:text-[color:var(--text)] hover:bg-[color:var(--bg-surface-3)] rounded-[var(--radius-sm)] transition-all" disabled={isAilyThinking}>
+                  <IconSend />
+                </button>
               </div>
             </div>
-          ))}
-          {isAilyThinking && (
-            <div className="flex justify-start animate-pulse">
-               <div className="bg-white p-3 rounded-[var(--radius-md)] text-xs text-slate-400 font-semibold border border-gray-200 shadow-sm">Aily 正在深度解构业务维度...</div>
-            </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
-
-        <div className="p-6 border-t border-gray-200 bg-white">
-          <div className="relative">
-            <input
-              type="text"
-              disabled={isAilyThinking}
-              placeholder="向 Aily 提问业务现状..."
-              className="w-full h-11 pl-4 pr-12 text-sm bg-white border border-gray-200 rounded-[var(--radius-md)] focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition-all placeholder:text-slate-400 text-slate-900"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  const input = e.currentTarget;
-                  if (!input.value || isAilyThinking) return;
-                  const text = input.value;
-                  setMessages(prev => [...prev, { role: 'user', text }]);
-                  input.value = '';
-                  askGemini(text);
-                }
-              }}
-            />
-            <button className="absolute right-2 top-2 bottom-2 w-8 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:bg-gray-100 rounded-[var(--radius-sm)] transition-all" disabled={isAilyThinking}>
-              <IconSend />
-            </button>
-          </div>
-          <p className="mt-4 text-[10px] text-slate-300 text-center font-bold tracking-[0.2em] uppercase">Gemini 3 Pro Solution Engine</p>
-        </div>
+          </>
+        )}
       </aside>
     </div>
   );

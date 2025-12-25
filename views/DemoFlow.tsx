@@ -24,7 +24,7 @@ const FlowNode: React.FC<{
   color: string;
 }> = ({ icon, title, desc, x, y, color }) => (
   <div 
-    className="absolute bg-white rounded-xl shadow-[var(--shadow-md)] border border-[color:var(--border)] p-4 w-64 flex flex-col gap-3 transition-transform hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] z-10"
+    className="absolute bg-[color:var(--bg-surface-1)] rounded-xl shadow-[var(--shadow-md)] border border-[color:var(--border)] p-4 w-64 min-h-[200px] flex flex-col gap-3 transition-transform hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] z-10"
     style={{ left: x, top: y }}
   >
     <div className={`h-1 absolute top-0 left-4 right-4 rounded-b-sm ${color}`}></div>
@@ -32,14 +32,14 @@ const FlowNode: React.FC<{
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color.replace('bg-', 'bg-opacity-10 text-')}`}>
         {icon}
       </div>
-      <h4 className="font-bold text-slate-800 text-sm">{title}</h4>
+      <h4 className="font-bold text-[color:var(--text)] text-sm">{title}</h4>
     </div>
-    <p className="text-xs text-slate-500 leading-relaxed bg-slate-50 p-2 rounded border border-slate-100">
+    <p className="text-xs text-[color:var(--text-2)] leading-relaxed bg-[color:var(--bg-surface-2)] p-2 rounded border border-[color:var(--border)]">
       {desc}
     </p>
     <div className="flex gap-2">
-       <span className="text-[10px] font-mono bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded">Input</span>
-       <span className="ml-auto text-[10px] font-mono bg-slate-100 text-slate-400 px-1.5 py-0.5 rounded">Output</span>
+       <span className="text-[10px] font-mono bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] px-1.5 py-0.5 rounded">Input</span>
+       <span className="ml-auto text-[10px] font-mono bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] px-1.5 py-0.5 rounded">Output</span>
     </div>
   </div>
 );
@@ -49,63 +49,135 @@ const FlowEdge: React.FC<{
   startY: number;
   endX: number;
   endY: number;
-}> = ({ startX, startY, endX, endY }) => {
-  // Simple cubic bezier
-  const midX = (startX + endX) / 2;
-  const path = `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`;
+  isVertical?: boolean;
+}> = ({ startX, startY, endX, endY, isVertical }) => {
+  let path = '';
+  
+  if (isVertical) {
+    // Vertical connection (S-shape turn)
+    const midY = (startY + endY) / 2;
+    path = `M ${startX} ${startY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${endY}`;
+  } else {
+    // Horizontal connection
+    const midX = (startX + endX) / 2;
+    path = `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`;
+  }
   
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible">
-      <path d={path} fill="none" stroke="#e2e8f0" strokeWidth="4" />
-      <path d={path} fill="none" stroke="#94a3b8" strokeWidth="2" strokeDasharray="6 4" className="animate-[dash_20s_linear_infinite]" />
-      <circle cx={endX} cy={endY} r="3" fill="#94a3b8" />
+      <path d={path} fill="none" stroke="var(--border)" strokeWidth="4" />
+      <path d={path} fill="none" stroke="var(--text-3)" strokeWidth="2" strokeDasharray="6 4" className="animate-[dash_20s_linear_infinite]" />
+      <circle cx={endX} cy={endY} r="3" fill="var(--text-3)" />
     </svg>
   );
 };
 
 const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
   const defaultNodes = [
-    { id: 1, title: '全景数据采集', desc: '实时接入工厂摄像头数据流与 IoT 传感器信号', icon: <IconCamera />, x: 100, y: 300, color: 'bg-blue-500' },
-    { id: 2, title: '多模态 AI 分析', desc: 'YOLOv8 + Gemini 联合分析，识别违规行为与设备隐患', icon: <IconBrain />, x: 450, y: 300, color: 'bg-purple-500' },
-    { id: 3, title: '智能业务路由', desc: '基于风险等级自动分发：警告/工单/停机指令', icon: <IconCheckSquare />, x: 800, y: 300, color: 'bg-orange-500' },
-    { id: 4, title: '闭环行动触达', desc: '推送飞书卡片给对应负责人，拉起应急群组', icon: <IconMessageSquare />, x: 1150, y: 300, color: 'bg-green-500' },
+    { id: 1, title: '全景数据采集', desc: '实时接入工厂摄像头数据流与 IoT 传感器信号', icon: <IconCamera />, color: 'bg-blue-500' },
+    { id: 2, title: '多模态 AI 分析', desc: 'YOLOv8 + Gemini 联合分析，识别违规行为与设备隐患', icon: <IconBrain />, color: 'bg-purple-500' },
+    { id: 3, title: '智能业务路由', desc: '基于风险等级自动分发：警告/工单/停机指令', icon: <IconCheckSquare />, color: 'bg-orange-500' },
+    { id: 4, title: '闭环行动触达', desc: '推送飞书卡片给对应负责人，拉起应急群组', icon: <IconMessageSquare />, color: 'bg-green-500' },
   ];
 
   const gtmNodes = [
-    { id: 1, title: '销售会议录制', desc: '飞书妙记自动录制销售沟通全过程', icon: <IconCamera />, x: 100, y: 300, color: 'bg-indigo-500' },
-    { id: 2, title: '智能风险提取', desc: 'AI 识别客户异议、预算风险与竞对信息', icon: <IconBrain />, x: 450, y: 300, color: 'bg-rose-500' },
-    { id: 3, title: 'CRM 自动同步', desc: '将风险点与关键信息自动回写至商机报表', icon: <IconCheckSquare />, x: 800, y: 300, color: 'bg-blue-500' },
-    { id: 4, title: '销售策略建议', desc: '生成针对性的销售话术与下一步行动卡片', icon: <IconMessageSquare />, x: 1150, y: 300, color: 'bg-emerald-500' },
+    { id: 1, title: '获客阶段 - 探探', desc: '可用于市场调研和客户需求分析，实现规模化调研一线用户，节省调研纪要整理时间', icon: <IconMessageSquare />, color: 'bg-blue-500' },
+    { id: 2, title: '商机阶段 - 参参', desc: '提供方案金句推荐、客户干系人及业务研究洞察、汇报故事线及案例推荐', icon: <IconBrain />, color: 'bg-purple-500' },
+    { id: 3, title: '商机阶段 - 呆呆', desc: '一键生成demo所需定制化数据，提升准备汇报的效率', icon: <IconMonitor />, color: 'bg-indigo-500' },
+    { id: 4, title: '商机阶段 - 图图', desc: '生成匹配飞书视觉风格的PPT配图，提升方案展示效果', icon: <IconCamera />, color: 'bg-pink-500' },
+    { id: 5, title: '签约阶段 - 蕊蕊', desc: '对方案汇报进行复盘，给出改进建议，提升销售团队整体水平', icon: <IconCheckSquare />, color: 'bg-green-500' },
+    { id: 6, title: '用户反馈 - 探探', desc: '可用于收集和分析用户反馈，帮助运营团队更好地了解客户需求', icon: <IconMessageSquare />, color: 'bg-blue-500' },
+    { id: 7, title: '客户培训 - 参参', desc: '为客户提供培训内容和案例推荐，提升客户满意度和忠诚度', icon: <IconBrain />, color: 'bg-purple-500' },
   ];
 
   const inspectionNodes = [
-    { id: 1, title: '摄像头点位输入', desc: '录入厂区点位与摄像头绑定信息，建立可追溯数据源', icon: <IconCamera />, x: 100, y: 300, color: 'bg-sky-500' },
-    { id: 2, title: '点位摄像头视频抽帧', desc: '从视频流按规则抽帧，生成可检索的图片序列', icon: <IconCamera />, x: 420, y: 300, color: 'bg-indigo-500' },
-    { id: 3, title: 'AI 识别违规', desc: '识别在岗玩手机、睡岗、5S 不合规等违规行为', icon: <IconBrain />, x: 740, y: 300, color: 'bg-purple-500' },
-    { id: 4, title: '数据录入', desc: '违规记录与字段自动入表，支持人工补充与复核', icon: <IconCheckSquare />, x: 1060, y: 300, color: 'bg-orange-500' },
-    { id: 5, title: '大屏展示', desc: '实时汇总告警与趋势，管理者在大屏一眼掌控', icon: <IconMonitor />, x: 1380, y: 300, color: 'bg-emerald-500' },
+    { id: 1, title: '摄像头点位输入', desc: '录入厂区点位与摄像头绑定信息，建立可追溯数据源', icon: <IconCamera />, color: 'bg-sky-500' },
+    { id: 2, title: '点位摄像头视频抽帧', desc: '从视频流按规则抽帧，生成可检索的图片序列', icon: <IconCamera />, color: 'bg-indigo-500' },
+    { id: 3, title: 'AI 识别违规', desc: '识别在岗玩手机、睡岗、5S 不合规等违规行为', icon: <IconBrain />, color: 'bg-purple-500' },
+    { id: 4, title: '数据录入', desc: '违规记录与字段自动入表，支持人工补充与复核', icon: <IconCheckSquare />, color: 'bg-orange-500' },
+    { id: 5, title: '大屏展示', desc: '实时汇总告警与趋势，管理者在大屏一眼掌控', icon: <IconMonitor />, color: 'bg-emerald-500' },
   ];
 
-  const nodes = demo.id === 'gtm' ? gtmNodes : demo.id === 'inspection' ? inspectionNodes : defaultNodes;
+  const rawNodes = demo.id === 'gtm' ? gtmNodes : demo.id === 'inspection' ? inspectionNodes : defaultNodes;
 
-  const canvasMinWidth = Math.max(1500, nodes[nodes.length - 1].x + 256 + 200);
-  const canvasMinHeight = 800;
+  // Layout Configuration
+  const COLUMNS = 3;
+  const CARD_WIDTH = 256;
+  const CARD_HEIGHT = 200; // Fixed height for layout
+  const GAP_X = 60;
+  const GAP_Y = 80;
+  const PADDING = 60;
+
+  // Calculate positions with S-shape layout
+  const nodes = rawNodes.map((node, index) => {
+    const row = Math.floor(index / COLUMNS);
+    const col = index % COLUMNS;
+    
+    // S-shape: Even rows L->R, Odd rows R->L
+    const isEvenRow = row % 2 === 0;
+    const effectiveCol = isEvenRow ? col : (COLUMNS - 1 - col);
+    
+    return {
+      ...node,
+      x: PADDING + effectiveCol * (CARD_WIDTH + GAP_X),
+      y: PADDING + row * (CARD_HEIGHT + GAP_Y),
+      row,
+      col: effectiveCol
+    };
+  });
+
+  // Calculate container size
+  const totalRows = Math.ceil(nodes.length / COLUMNS);
+  const containerWidth = PADDING * 2 + COLUMNS * CARD_WIDTH + (COLUMNS - 1) * GAP_X;
+  const containerHeight = PADDING * 2 + totalRows * CARD_HEIGHT + (totalRows - 1) * GAP_Y;
 
   return (
-    <div className="flex-1 flex h-full bg-slate-50 overflow-hidden relative font-sans">
+    <div className="flex-1 flex h-full bg-[color:var(--bg-body)] overflow-hidden relative font-sans">
       {/* Canvas Area */}
-      <div className="flex-1 relative overflow-auto bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] cursor-grab active:cursor-grabbing">
-         <div className="relative p-20 flex items-center justify-center" style={{ minWidth: canvasMinWidth, minHeight: canvasMinHeight }}>
+      <div className="flex-1 relative overflow-auto bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:20px_20px] flex items-center justify-center">
+         <div className="relative" style={{ width: containerWidth, height: containerHeight }}>
             {/* Edges */}
-            {nodes.slice(0, -1).map((node, i) => (
-              <FlowEdge 
-                key={i}
-                startX={node.x + 256} // width of card
-                startY={node.y + 60} // roughly middle
-                endX={nodes[i+1].x}
-                endY={nodes[i+1].y + 60}
-              />
-            ))}
+            {nodes.slice(0, -1).map((node, i) => {
+              const nextNode = nodes[i+1];
+              const isVertical = node.row !== nextNode.row;
+              
+              // Calculate connection points
+              let startX, startY, endX, endY;
+
+              if (isVertical) {
+                // Connecting from bottom of current to top of next
+                startX = node.x + CARD_WIDTH / 2;
+                startY = node.y + CARD_HEIGHT; // Bottom of card
+                endX = nextNode.x + CARD_WIDTH / 2;
+                endY = nextNode.y; // Top of card
+              } else {
+                // Horizontal connection
+                if (node.col < nextNode.col) {
+                  // L -> R
+                  startX = node.x + CARD_WIDTH;
+                  startY = node.y + CARD_HEIGHT / 2;
+                  endX = nextNode.x;
+                  endY = nextNode.y + CARD_HEIGHT / 2;
+                } else {
+                  // R -> L
+                  startX = node.x;
+                  startY = node.y + CARD_HEIGHT / 2;
+                  endX = nextNode.x + CARD_WIDTH;
+                  endY = nextNode.y + CARD_HEIGHT / 2;
+                }
+              }
+
+              return (
+                <FlowEdge 
+                  key={i}
+                  startX={startX}
+                  startY={startY}
+                  endX={endX}
+                  endY={endY}
+                  isVertical={isVertical}
+                />
+              );
+            })}
 
             {/* Nodes */}
             {nodes.map(node => (
@@ -114,30 +186,30 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
          </div>
          
          <div className="absolute top-6 left-6 z-20">
-            <div className="bg-white/80 backdrop-blur shadow-sm border border-slate-200 rounded-lg p-3 flex items-center gap-3">
-               <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-               <span className="text-xs font-semibold text-slate-600">流程引擎运行中</span>
+            <div className="bg-[color:var(--bg-surface-1)]/80 backdrop-blur shadow-sm border border-[color:var(--border)] rounded-lg p-3 flex items-center gap-3">
+               <span className="flex h-2 w-2 rounded-full bg-[color:var(--success)] animate-pulse"></span>
+               <span className="text-xs font-semibold text-[color:var(--text-2)]">流程引擎运行中</span>
             </div>
          </div>
       </div>
 
       {/* Right Sidebar */}
-      <div className="w-[360px] bg-white border-l border-[color:var(--border)] shadow-xl z-30 flex flex-col">
+      <div className="w-[360px] bg-[color:var(--bg-surface-1)] border-l border-[color:var(--border)] shadow-xl z-30 flex flex-col">
         {/* Header */}
         <div className="h-16 border-b border-[color:var(--border)] flex items-center justify-between px-6">
            <div className="flex items-center gap-2">
-             <span className="ui-tag px-2 py-0.5 text-[10px] bg-slate-100 text-slate-500 border-slate-200">Flow</span>
-             <h3 className="text-sm font-bold text-slate-900">业务流程编排</h3>
+             <span className="ui-tag px-2 py-0.5 text-[10px] bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] border-[color:var(--border)]">Flow</span>
+             <h3 className="text-sm font-bold text-[color:var(--text)]">业务流程编排</h3>
            </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 p-6 overflow-y-auto">
-           <div className="aspect-video w-full rounded-xl bg-slate-100 border border-slate-200 mb-6 overflow-hidden relative group">
+           <div className="aspect-video w-full rounded-xl bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] mb-6 overflow-hidden relative group">
               {demo.cover ? (
                 <img src={demo.cover} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-slate-300">Preview</div>
+                <div className="w-full h-full flex items-center justify-center text-[color:var(--text-3)]">Preview</div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4">
                  <h2 className="text-white font-bold text-lg">{demo.title}</h2>
@@ -146,18 +218,18 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
 
            <div className="space-y-6">
               <div>
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest mb-3">流程说明</h4>
-                <p className="text-sm text-slate-500 leading-relaxed font-light">
+                <h4 className="text-xs font-bold text-[color:var(--text)] uppercase tracking-widest mb-3">流程说明</h4>
+                <p className="text-sm text-[color:var(--text-2)] leading-relaxed font-light">
                   {demo.valueProp}
                 </p>
               </div>
 
               <div>
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest mb-3">关键节点</h4>
+                <h4 className="text-xs font-bold text-[color:var(--text)] uppercase tracking-widest mb-3">关键节点</h4>
                 <ul className="space-y-3">
                   {nodes.map((n, i) => (
-                    <li key={n.id} className="flex items-center gap-3 text-sm text-slate-600">
-                      <span className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">{i+1}</span>
+                    <li key={n.id} className="flex items-center gap-3 text-sm text-[color:var(--text-2)]">
+                      <span className="w-5 h-5 rounded-full bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center text-[10px] font-bold text-[color:var(--text-3)]">{i+1}</span>
                       <span>{n.title}</span>
                     </li>
                   ))}
@@ -167,15 +239,15 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-[color:var(--border)] bg-slate-50">
+        <div className="p-6 border-t border-[color:var(--border)] bg-[color:var(--bg-surface-1)]">
            <button 
              onClick={onEnterApp}
-             className="w-full ui-btn ui-btn-primary h-12 text-sm shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all transform active:scale-95 flex items-center justify-center gap-2 text-black"
+             className="w-full ui-btn ui-btn-primary h-12 text-sm shadow-lg shadow-[color:var(--primary)]/20 hover:shadow-[color:var(--primary)]/30 transition-all transform active:scale-95 flex items-center justify-center gap-2 text-white"
            >
              <IconPlay />
              进入应用
            </button>
-           <p className="text-center mt-3 text-[10px] text-slate-400">
+           <p className="text-center mt-3 text-[10px] text-[color:var(--text-3)]">
              点击即可进入应用模式体验真实交互
            </p>
         </div>
