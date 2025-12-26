@@ -12,7 +12,7 @@ const ToolAvatar: React.FC<{ tool: EfficiencyTool }> = ({ tool }) => {
       <img
         src={tool.avatarUrl}
         alt={tool.name}
-        className="w-12 h-12 rounded-[var(--radius-md)] object-cover border border-white/10"
+        className="w-full h-full object-cover"
         loading="lazy"
         referrerPolicy="no-referrer"
       />
@@ -48,7 +48,7 @@ const Efficiency: React.FC = () => {
             <div key={tool.id} className="ui-card p-5 lg:p-6 hover:border-[color:var(--border-strong)] hover:bg-[color:var(--bg-surface-2)] transition-all duration-300 group">
               <div className="flex items-start justify-between gap-4 mb-5 min-w-0">
                 <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-3)] group-hover:text-[color:var(--text)] transition-colors overflow-hidden">
+                  <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-3)] group-hover:text-[color:var(--text)] transition-colors overflow-hidden flex-shrink-0">
                      <ToolAvatar tool={tool} />
                   </div>
                   <div className="min-w-0">

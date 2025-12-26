@@ -738,13 +738,11 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
                               className="p-4 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-surface-2)] hover:border-[color:var(--primary)] transition-all cursor-pointer group flex gap-3"
                               onClick={() => tool?.url && window.open(tool.url, '_blank')}
                             >
-                              <div className="w-10 h-10 rounded-full bg-[color:var(--bg-surface-1)] border border-[color:var(--border)] flex-shrink-0 overflow-hidden">
+                              <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center overflow-hidden flex-shrink-0">
                                 {tool?.avatarUrl ? (
-                                  <img src={tool.avatarUrl} alt={step.component} className="w-full h-full object-cover" />
+                                  <img src={tool.avatarUrl} alt={tool?.name} className="w-full h-full object-cover" />
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-[color:var(--text-3)]">
-                                    <IconZap />
-                                  </div>
+                                  <IconZap />
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
