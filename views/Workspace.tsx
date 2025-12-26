@@ -837,7 +837,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
                   <div className={`max-w-[90%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm border ${msg.role === 'ai' ? 'bg-[color:var(--bg-surface-2)] border-[color:var(--border)] text-[color:var(--text)]' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
                     {msg.text && <div className="whitespace-pre-wrap">{msg.text}</div>}
                     {msg.card && msg.card.type === 'violation' && (
-                      <ViolationCard {...msg.card.data} />
+                      <ViolationCard 
+                        {...msg.card.data} 
+                        onViewDetails={() => setBaseViewMode('table')}
+                      />
                     )}
                   </div>
                 </div>

@@ -9,6 +9,7 @@ interface ViolationCardProps {
   department: string;
   date: string;
   time: string;
+  onViewDetails?: () => void;
 }
 
 const ViolationCard: React.FC<ViolationCardProps> = ({
@@ -20,6 +21,7 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
   department,
   date,
   time,
+  onViewDetails,
 }) => {
   const confidencePercent = (confidence * 100).toFixed(1);
   
@@ -152,7 +154,10 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
         </div>
 
         {/* 操作按钮 - 蓝色填充 */}
-        <button className="w-full bg-[#3370FF] hover:bg-[#2B5DD1] text-white py-2.5 rounded-lg text-xs font-medium transition-all shadow-sm">
+        <button 
+          onClick={onViewDetails}
+          className="w-full bg-[#3370FF] hover:bg-[#2B5DD1] text-white py-2.5 rounded-lg text-xs font-medium transition-all shadow-sm"
+        >
           立即查看详情
         </button>
       </div>
