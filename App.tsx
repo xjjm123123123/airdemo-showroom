@@ -99,7 +99,7 @@ const App: React.FC = () => {
   ];
 
   return (
-    <div className="h-screen flex flex-col bg-[color:var(--bg)] overflow-hidden font-sans relative">
+    <div className="h-[100dvh] w-full bg-[color:var(--bg)] overflow-hidden font-sans relative">
       <div className="absolute inset-0 pointer-events-none z-0 opacity-40">
         <Prism 
           animationType="rotate" 
@@ -114,7 +114,7 @@ const App: React.FC = () => {
           suspendWhenOffscreen={true}
         /> 
       </div>
-      <header className="h-14 border-b border-[color:var(--border)] flex items-center justify-between px-4 lg:px-6 bg-[color:var(--bg-surface-1)] flex-shrink-0 z-50 relative">
+      <header className="fixed top-0 left-0 right-0 h-14 border-b border-[color:var(--border)] flex items-center justify-between px-4 lg:px-6 bg-[color:var(--bg-surface-1)] z-50">
         <div className="flex items-center gap-4 lg:gap-6 min-w-0 flex-1">
           <div className="flex items-center gap-3 cursor-pointer group flex-shrink-0" onClick={handleGoHome}>
             <img 
@@ -251,7 +251,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <main className={`flex-1 flex flex-col lg:flex-row overflow-hidden relative z-10 ${isLightMode ? 'light-theme' : ''}`}>
+      <main className={`absolute top-14 bottom-0 left-0 right-0 flex flex-col lg:flex-row overflow-hidden z-10 ${isLightMode ? 'light-theme' : ''}`}>
         {currentApp === 'efficiency' ? (
           <Efficiency />
         ) : selectedDemo ? (

@@ -312,61 +312,61 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
                <span className="text-xs font-semibold text-[color:var(--text-2)]">流程引擎运行中</span>
             </div>
          </div>
-
-         {/* Right Panel Toggle */}
-         {!isRightPanelOpen && (
+      </div>
+      
+      {/* Right Panel Toggle */}
+      {!isRightPanelOpen && (
            <button
              onClick={() => setIsRightPanelOpen(true)}
-             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20 ui-btn ui-btn-secondary h-10 px-5 text-xs font-semibold"
+             className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 ui-btn ui-btn-secondary h-10 px-5 text-xs font-semibold"
            >
              打开流程说明
            </button>
          )}
-      </div>
-
-      {/* Right Sidebar */}
-      {isRightPanelOpen && (
-      <div className="w-[360px] bg-[color:var(--bg-surface-1)] border-l border-[color:var(--border)] shadow-xl z-30 flex flex-col">
-        {/* Header */}
-        <div className="h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 md:px-6">
-           <div className="flex items-center gap-2">
-             <span className="ui-tag px-2 py-0.5 text-[10px] bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] border-[color:var(--border)]">Flow</span>
-             <h3 className="text-sm font-bold text-[color:var(--text)] whitespace-nowrap">业务流程编排</h3>
-           </div>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 p-6 overflow-y-auto">
-           <div className="aspect-video w-full rounded-xl bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] mb-6 overflow-hidden relative group">
-              {demo.cover ? (
-                <img src={demo.cover} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-[color:var(--text-3)]">Preview</div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4">
-                 <h2 className="text-white font-bold text-lg">{demo.title}</h2>
+      
+         {/* Right Sidebar */}
+         {isRightPanelOpen && (
+         <div className="w-[360px] bg-[color:var(--bg-surface-1)] border-l border-[color:var(--border)] shadow-xl z-30 flex flex-col">
+           {/* Header */}
+           <div className="h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 md:px-6">
+              <div className="flex items-center gap-2">
+                <span className="ui-tag px-2 py-0.5 text-[10px] bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] border-[color:var(--border)]">Flow</span>
+                <h3 className="text-sm font-bold text-[color:var(--text)] whitespace-nowrap">业务流程编排</h3>
               </div>
            </div>
 
-           <div className="space-y-6">
-              <div>
-                <h4 className="text-xs font-bold text-[color:var(--text)] uppercase tracking-widest mb-3">流程说明</h4>
-                <p className="text-sm text-[color:var(--text-2)] leading-relaxed font-light">
-                  {demo.valueProp}
-                </p>
+           {/* Content */}
+           <div className="flex-1 p-6 overflow-y-auto">
+              <div className="aspect-video w-full rounded-xl bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] mb-6 overflow-hidden relative group">
+                 {demo.cover ? (
+                   <img src={demo.cover} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                 ) : (
+                   <div className="w-full h-full flex items-center justify-center text-[color:var(--text-3)]">Preview</div>
+                 )}
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4">
+                    <h2 className="text-white font-bold text-lg">{demo.title}</h2>
+                 </div>
               </div>
 
-              <div>
-                <h4 className="text-xs font-bold text-[color:var(--text)] uppercase tracking-widest mb-3">关键节点</h4>
-                <ul className="space-y-3">
-                  {nodes.map((n, i) => (
-                    <li key={n.id} className="flex items-center gap-3 text-sm text-[color:var(--text-2)]">
-                      <span className="w-5 h-5 rounded-full bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center text-[10px] font-bold text-[color:var(--text-3)]">{i+1}</span>
-                      <span>{n.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-xs font-bold text-[color:var(--text)] uppercase tracking-widest mb-3">流程说明</h4>
+                  <p className="text-sm text-[color:var(--text-2)] leading-relaxed font-light">
+                    {demo.valueProp}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold text-[color:var(--text)] uppercase tracking-widest mb-3">关键节点</h4>
+                  <ul className="space-y-3">
+                    {nodes.map((n, i) => (
+                      <li key={n.id} className="flex items-center gap-3 text-sm text-[color:var(--text-2)]">
+                        <span className="w-5 h-5 rounded-full bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center text-[10px] font-bold text-[color:var(--text-3)]">{i+1}</span>
+                        <span>{n.title}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
            </div>
         </div>
 
