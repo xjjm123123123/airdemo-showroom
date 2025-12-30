@@ -217,7 +217,7 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
     const CARD_HEIGHT = 200;
     const GAP_X = 60;
     const GAP_Y = 80;
-    const PADDING = 60;
+    const PADDING = 300;
 
     const positionedNodes = rawNodes.map((node, index) => {
       const row = Math.floor(index / COLUMNS);
@@ -247,63 +247,65 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
   return (
     <div className="flex-1 flex h-full bg-[color:var(--bg-body)] overflow-hidden relative font-sans">
       {/* Canvas Area */}
-      <div className="flex-1 relative overflow-auto bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:20px_20px] flex items-center justify-center">
-         <div className="relative" style={{ width: containerWidth, height: containerHeight }}>
-            {/* Edges */}
-            {edges.map((edge, i) => {
-              const from = nodeById.get(edge.from);
-              const to = nodeById.get(edge.to);
-              if (!from || !to) return null;
+      <div className="flex-1 relative overflow-auto bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:20px_20px]">
+         <div className="min-w-full min-h-full flex">
+           <div className="relative flex-shrink-0 m-auto" style={{ width: containerWidth, height: containerHeight }}>
+              {/* Edges */}
+              {edges.map((edge, i) => {
+                const from = nodeById.get(edge.from);
+                const to = nodeById.get(edge.to);
+                if (!from || !to) return null;
 
-              const isVertical = from.y !== to.y;
+                const isVertical = from.y !== to.y;
 
-              let startX: number;
-              let startY: number;
-              let endX: number;
-              let endY: number;
+                let startX: number;
+                let startY: number;
+                let endX: number;
+                let endY: number;
 
-              if (isVertical) {
-                if (from.y < to.y) {
-                  startX = from.x + cardWidth / 2;
-                  startY = from.y + cardHeight;
-                  endX = to.x + cardWidth / 2;
-                  endY = to.y;
+                if (isVertical) {
+                  if (from.y < to.y) {
+                    startX = from.x + cardWidth / 2;
+                    startY = from.y + cardHeight;
+                    endX = to.x + cardWidth / 2;
+                    endY = to.y;
+                  } else {
+                    startX = from.x + cardWidth / 2;
+                    startY = from.y;
+                    endX = to.x + cardWidth / 2;
+                    endY = to.y + cardHeight;
+                  }
                 } else {
-                  startX = from.x + cardWidth / 2;
-                  startY = from.y;
-                  endX = to.x + cardWidth / 2;
-                  endY = to.y + cardHeight;
+                  if (from.x < to.x) {
+                    startX = from.x + cardWidth;
+                    startY = from.y + cardHeight / 2;
+                    endX = to.x;
+                    endY = to.y + cardHeight / 2;
+                  } else {
+                    startX = from.x;
+                    startY = from.y + cardHeight / 2;
+                    endX = to.x + cardWidth;
+                    endY = to.y + cardHeight / 2;
+                  }
                 }
-              } else {
-                if (from.x < to.x) {
-                  startX = from.x + cardWidth;
-                  startY = from.y + cardHeight / 2;
-                  endX = to.x;
-                  endY = to.y + cardHeight / 2;
-                } else {
-                  startX = from.x;
-                  startY = from.y + cardHeight / 2;
-                  endX = to.x + cardWidth;
-                  endY = to.y + cardHeight / 2;
-                }
-              }
 
-              return (
-                <FlowEdge
-                  key={`${edge.from}-${edge.to}-${i}`}
-                  startX={startX}
-                  startY={startY}
-                  endX={endX}
-                  endY={endY}
-                  isVertical={isVertical}
-                />
-              );
-            })}
+                return (
+                  <FlowEdge
+                    key={`${edge.from}-${edge.to}-${i}`}
+                    startX={startX}
+                    startY={startY}
+                    endX={endX}
+                    endY={endY}
+                    isVertical={isVertical}
+                  />
+                );
+              })}
 
-            {/* Nodes */}
-            {nodes.map(node => (
-              <FlowNode key={node.id} {...node} />
-            ))}
+              {/* Nodes */}
+              {nodes.map(node => (
+                <FlowNode key={node.id} {...node} />
+              ))}
+           </div>
          </div>
          
          <div className="absolute top-6 left-6 z-20">
