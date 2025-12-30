@@ -4,8 +4,8 @@ import { BusinessContext, Demo } from './types';
 const INSPECTION_IMAGE = "https://files.imagetourl.net/uploads/1766244783700-c685ecaa-ae04-455d-b39d-91ac6ab7d54a.png";
 const MECHANICAL_IMAGE = "https://files.imagetourl.net/uploads/1766245759016-b1a82b7e-adc4-438c-84b4-d4e95790c2d1.png";
 const EQUIPMENT_IMAGE = "https://files.imagetourl.net/uploads/1766248925406-a7bffe6f-cd74-4605-8298-5a197f13b881.png";
-const INSPECTION_COVER_URL = "https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%886.50.56.png";
-const GTM_COVER_URL = "https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%883.35.20.png";
+export const INSPECTION_COVER_URL = "https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%886.50.56.png";
+export const GTM_COVER_URL = "https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%883.35.20.png";
 
 export const PROMPT_TEMPLATES: BusinessContext[] = [
   {
@@ -56,7 +56,7 @@ export const PROMPT_TEMPLATES: BusinessContext[] = [
       '请基于当前可见的多维表格数据，输出一份“深度合规风险诊断”。要求：\n' +
       '1) 先给出结论（1-2句）与风险总览（按风险等级/状态/部门或岗位）。\n' +
       '2) 列出 Top 5 风险点：每条必须包含【证据数据（行/字段）、风险原因、影响、整改建议、负责人建议、完成期限】。\n' +
-      '3) 指出系统性管理缺口（如流程、培训、排班、复核机制、设备保养策略）。\n' +
+      '3) 指出nsystem管理缺口（如流程、培训、排班、复核机制、设备保养策略）。\n' +
       '4) 给出下一步行动清单（3-6条），按优先级排序。\n\n' +
       '输出语言：中文。风格：简洁、专业、结果导向。'
   },
@@ -289,7 +289,7 @@ export const EFFICIENCY_TOOLS = [
     name: '图图',
     title: 'AI PPT插图助手',
     avatarUrl:
-      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.51.png',
+      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.58.png',
     url: 'https://bytedance.larkoffice.com/app/PwQtb3EjOa4nIOsgtnBcxeMQnud?chunked=false&pageId=pgepRQZvt4TG14Kb',
     skills: ['生成匹配飞书视觉风格的PPT配图'],
     highlight: '认养一头牛董事长徐晓波在AI大讲堂中只拍了三页，但都是AI生成配图的PPT'
@@ -299,7 +299,7 @@ export const EFFICIENCY_TOOLS = [
     name: '参参',
     title: 'AI故事线参谋',
     avatarUrl:
-      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.31.png',
+      'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.37.png',
     url: 'https://bytedance.larkoffice.com/share/base/form/shrcn5qfPJUyu3YJwTmWz0idEbf',
     skills: ['方案汇报自动化给出复盘建议'],
     highlight: '发见客户讲一半电脑没电了，扣了很多分'

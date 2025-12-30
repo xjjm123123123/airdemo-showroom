@@ -35,7 +35,7 @@ const Prism: React.FC<PrismProps> = ({
   hoverStrength = 2,
   inertia = 0.05,
   bloom = 1,
-  suspendWhenOffscreen = false,
+  suspendWhenOffscreen = true,
   timeScale = 0.5
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -177,7 +177,7 @@ const Prism: React.FC<PrismProps> = ({
           wob = mat2(c0, c1, c2, c0);
         }
 
-        const int STEPS = 100;
+        const int STEPS = 60;
         for (int i = 0; i < STEPS; i++) {
           p = vec3(f, z);
           p.xz = p.xz * wob;

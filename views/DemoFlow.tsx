@@ -1,14 +1,6 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Demo } from '../types';
-
-// Reuse icons or define new ones
-const IconArrowRight = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
-const IconCamera = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>;
-const IconBrain = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"></path><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"></path></svg>;
-const IconCheckSquare = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>;
-const IconMessageSquare = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>;
-const IconMonitor = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>;
-const IconPlay = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
+import { ArrowRight, Camera, Brain, CheckSquare, MessageSquare, Monitor, Play } from 'lucide-react';
 
 interface DemoFlowProps {
   demo: Demo;
@@ -24,22 +16,22 @@ const FlowNode: React.FC<{
   color: string;
 }> = ({ icon, title, desc, x, y, color }) => (
   <div 
-    className="absolute bg-[color:var(--bg-surface-1)] rounded-xl shadow-[var(--shadow-md)] border border-[color:var(--border)] p-4 w-64 min-h-[200px] flex flex-col gap-3 transition-transform hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] z-10"
+    className="absolute bg-[color:var(--bg-surface-1)] rounded-[var(--radius-xl)] shadow-[var(--shadow-md)] border border-[color:var(--border)] p-4 w-64 min-h-[200px] flex flex-col gap-3 transition-transform hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] z-10"
     style={{ left: x, top: y }}
   >
     <div className={`h-1 absolute top-0 left-4 right-4 rounded-b-sm ${color}`}></div>
     <div className="flex items-center gap-3 mt-2">
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color.replace('bg-', 'bg-opacity-10 text-')}`}>
+      <div className={`w-10 h-10 rounded-[var(--radius-md)] flex items-center justify-center ${color.replace('bg-', 'bg-opacity-10 text-')}`}>
         {icon}
       </div>
       <h4 className="font-bold text-[color:var(--text)] text-sm">{title}</h4>
     </div>
-    <p className="text-xs text-[color:var(--text-2)] leading-relaxed bg-[color:var(--bg-surface-2)] p-2 rounded border border-[color:var(--border)]">
+    <p className="text-xs text-[color:var(--text-2)] leading-relaxed bg-[color:var(--bg-surface-2)] p-2 rounded-[var(--radius-sm)] border border-[color:var(--border)]">
       {desc}
     </p>
     <div className="flex gap-2">
-       <span className="text-[10px] font-mono bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] px-1.5 py-0.5 rounded">Input</span>
-       <span className="ml-auto text-[10px] font-mono bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] px-1.5 py-0.5 rounded">Output</span>
+       <span className="text-[10px] font-mono bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] px-1.5 py-0.5 rounded-[var(--radius-xs)]">Input</span>
+       <span className="ml-auto text-[10px] font-mono bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] px-1.5 py-0.5 rounded-[var(--radius-xs)]">Output</span>
     </div>
   </div>
 );
@@ -73,63 +65,184 @@ const FlowEdge: React.FC<{
 };
 
 const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
-  const defaultNodes = [
-    { id: 1, title: '全景数据采集', desc: '实时接入工厂摄像头数据流与 IoT 传感器信号', icon: <IconCamera />, color: 'bg-blue-500' },
-    { id: 2, title: '多模态 AI 分析', desc: 'YOLOv8 + Gemini 联合分析，识别违规行为与设备隐患', icon: <IconBrain />, color: 'bg-purple-500' },
-    { id: 3, title: '智能业务路由', desc: '基于风险等级自动分发：警告/工单/停机指令', icon: <IconCheckSquare />, color: 'bg-orange-500' },
-    { id: 4, title: '闭环行动触达', desc: '推送飞书卡片给对应负责人，拉起应急群组', icon: <IconMessageSquare />, color: 'bg-green-500' },
-  ];
-
-  const gtmNodes = [
-    { id: 1, title: '获客阶段 - 探探', desc: '可用于市场调研和客户需求分析，实现规模化调研一线用户，节省调研纪要整理时间', icon: <IconMessageSquare />, color: 'bg-blue-500' },
-    { id: 2, title: '商机阶段 - 参参', desc: '提供方案金句推荐、客户干系人及业务研究洞察、汇报故事线及案例推荐', icon: <IconBrain />, color: 'bg-purple-500' },
-    { id: 3, title: '商机阶段 - 呆呆', desc: '一键生成demo所需定制化数据，提升准备汇报的效率', icon: <IconMonitor />, color: 'bg-indigo-500' },
-    { id: 4, title: '商机阶段 - 图图', desc: '生成匹配飞书视觉风格的PPT配图，提升方案展示效果', icon: <IconCamera />, color: 'bg-pink-500' },
-    { id: 5, title: '签约阶段 - 蕊蕊', desc: '对方案汇报进行复盘，给出改进建议，提升销售团队整体水平', icon: <IconCheckSquare />, color: 'bg-green-500' },
-    { id: 6, title: '用户反馈 - 探探', desc: '可用于收集和分析用户反馈，帮助运营团队更好地了解客户需求', icon: <IconMessageSquare />, color: 'bg-blue-500' },
-    { id: 7, title: '客户培训 - 参参', desc: '为客户提供培训内容和案例推荐，提升客户满意度和忠诚度', icon: <IconBrain />, color: 'bg-purple-500' },
-  ];
-
-  const inspectionNodes = [
-    { id: 1, title: '摄像头点位输入', desc: '录入厂区点位与摄像头绑定信息，建立可追溯数据源', icon: <IconCamera />, color: 'bg-sky-500' },
-    { id: 2, title: '点位摄像头视频抽帧', desc: '从视频流按规则抽帧，生成可检索的图片序列', icon: <IconCamera />, color: 'bg-indigo-500' },
-    { id: 3, title: 'AI 识别违规', desc: '识别在岗玩手机、睡岗、5S 不合规等违规行为', icon: <IconBrain />, color: 'bg-purple-500' },
-    { id: 4, title: '数据录入', desc: '违规记录与字段自动入表，支持人工补充与复核', icon: <IconCheckSquare />, color: 'bg-orange-500' },
-    { id: 5, title: '大屏展示', desc: '实时汇总告警与趋势，管理者在大屏一眼掌控', icon: <IconMonitor />, color: 'bg-emerald-500' },
-  ];
-
-  const rawNodes = demo.id === 'gtm' ? gtmNodes : demo.id === 'inspection' ? inspectionNodes : defaultNodes;
-
-  // Layout Configuration
-  const COLUMNS = 3;
-  const CARD_WIDTH = 256;
-  const CARD_HEIGHT = 200; // Fixed height for layout
-  const GAP_X = 60;
-  const GAP_Y = 80;
-  const PADDING = 60;
-
-  // Calculate positions with S-shape layout
-  const nodes = rawNodes.map((node, index) => {
-    const row = Math.floor(index / COLUMNS);
-    const col = index % COLUMNS;
-    
-    // S-shape: Even rows L->R, Odd rows R->L
-    const isEvenRow = row % 2 === 0;
-    const effectiveCol = isEvenRow ? col : (COLUMNS - 1 - col);
-    
-    return {
-      ...node,
-      x: PADDING + effectiveCol * (CARD_WIDTH + GAP_X),
-      y: PADDING + row * (CARD_HEIGHT + GAP_Y),
-      row,
-      col: effectiveCol
-    };
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState(() => {
+    // Default open on desktop (width > 768px), closed on mobile
+    return window.innerWidth > 768;
   });
 
-  // Calculate container size
-  const totalRows = Math.ceil(nodes.length / COLUMNS);
-  const containerWidth = PADDING * 2 + COLUMNS * CARD_WIDTH + (COLUMNS - 1) * GAP_X;
-  const containerHeight = PADDING * 2 + totalRows * CARD_HEIGHT + (totalRows - 1) * GAP_Y;
+  const defaultNodes = [
+    { id: 1, title: '全景数据采集', desc: '实时接入工厂摄像头数据流与 IoT 传感器信号', icon: <Camera size={20} />, color: 'bg-blue-500' },
+    { id: 2, title: '多模态 AI 分析', desc: 'YOLOv8 + Gemini 联合分析，识别违规行为与设备隐患', icon: <Brain size={20} />, color: 'bg-purple-500' },
+    { id: 3, title: '智能业务路由', desc: '基于风险等级自动分发：警告/工单/停机指令', icon: <CheckSquare size={20} />, color: 'bg-orange-500' },
+    { id: 4, title: '闭环行动触达', desc: '推送飞书卡片给对应负责人，拉起应急群组', icon: <MessageSquare size={20} />, color: 'bg-green-500' },
+  ];
+
+  const inspectionFlow = useMemo(() => {
+    const CARD_WIDTH = 256;
+    const CARD_HEIGHT = 200;
+    const GAP_X = 84;
+    const GAP_Y = 120;
+
+    const topY = GAP_Y;
+    const bottomY = GAP_Y + CARD_HEIGHT + GAP_Y;
+
+    // Calculate the actual width of the node group (from col1X to col3X + CARD_WIDTH)
+    const groupWidth = 3 * CARD_WIDTH + 2 * GAP_X;
+    const groupHeight = 2 * CARD_HEIGHT + GAP_Y;
+
+    // Calculate container size with equal padding on all sides
+    const containerWidth = groupWidth + GAP_X * 2;
+    const containerHeight = groupHeight + GAP_Y * 2;
+
+    // Calculate starting X position to center the node group
+    const startX = (containerWidth - groupWidth) / 2;
+
+    const col1X = startX;
+    const col2X = startX + CARD_WIDTH + GAP_X;
+    const col3X = startX + (CARD_WIDTH + GAP_X) * 2;
+
+    const nodes = [
+      {
+        id: 1,
+        title: '摄像头点位输入',
+        desc: '录入厂区点位与摄像头绑定信息，建立可追溯数据源',
+        icon: <Camera size={20} />,
+        color: 'bg-blue-500',
+        x: col1X,
+        y: topY,
+      },
+      {
+        id: 2,
+        title: '点位摄像头视频抽帧',
+        desc: '从视频流按规则抽帧，生成可检索的图片序列',
+        icon: <Camera size={20} />,
+        color: 'bg-indigo-500',
+        x: col2X,
+        y: topY,
+      },
+      {
+        id: 3,
+        title: 'AI 识别违规',
+        desc: '识别在岗玩手机、睡岗、5S 不合规等违规行为',
+        icon: <Brain size={20} />,
+        color: 'bg-purple-500',
+        x: col3X,
+        y: topY,
+      },
+      {
+        id: 4,
+        title: '大屏展示',
+        desc: '实时汇总告警与趋势，管理者在大屏一眼掌控',
+        icon: <Monitor size={20} />,
+        color: 'bg-green-500',
+        x: col2X,
+        y: bottomY,
+      },
+      {
+        id: 5,
+        title: '数据录入',
+        desc: '违规记录与字段自动入表，支持人工补充与复核',
+        icon: <CheckSquare size={20} />,
+        color: 'bg-orange-500',
+        x: col3X,
+        y: bottomY,
+      },
+    ];
+
+    const edges: Array<{ from: number; to: number }> = [
+      { from: 1, to: 2 },
+      { from: 2, to: 3 },
+      { from: 2, to: 4 },
+      { from: 3, to: 5 },
+      { from: 4, to: 5 },
+    ];
+
+    return { nodes, edges, containerWidth, containerHeight, CARD_WIDTH, CARD_HEIGHT };
+  }, []);
+
+  const { nodes, edges, containerWidth, containerHeight, cardWidth, cardHeight } = useMemo(() => {
+    if (demo.id === 'inspection') {
+      return {
+        nodes: inspectionFlow.nodes,
+        edges: inspectionFlow.edges,
+        containerWidth: inspectionFlow.containerWidth,
+        containerHeight: inspectionFlow.containerHeight,
+        cardWidth: inspectionFlow.CARD_WIDTH,
+        cardHeight: inspectionFlow.CARD_HEIGHT,
+      };
+    }
+
+    const rawNodes = demo.steps && demo.steps.length > 0
+      ? demo.steps.map((step) => {
+          const getIcon = (component: string) => {
+            const iconMap: Record<string, React.ReactNode> = {
+              '探探': <MessageSquare size={20} />,
+              '参参': <Brain size={20} />,
+              '呆呆': <Monitor size={20} />,
+              '图图': <Camera size={20} />,
+              '蕊蕊': <CheckSquare size={20} />,
+              'Aily': <Brain size={20} />,
+              '移动端': <Camera size={20} />,
+              'Base 表格': <CheckSquare size={20} />,
+            };
+            return iconMap[component] || <Brain size={20} />;
+          };
+
+          const getColor = (component: string) => {
+            const colorMap: Record<string, string> = {
+              '探探': 'bg-blue-500',
+              '参参': 'bg-purple-500',
+              '呆呆': 'bg-indigo-500',
+              '图图': 'bg-pink-500',
+              '蕊蕊': 'bg-green-500',
+              'Aily': 'bg-purple-500',
+              '移动端': 'bg-sky-500',
+              'Base 表格': 'bg-orange-500',
+            };
+            return colorMap[component] || 'bg-blue-500';
+          };
+
+          return {
+            id: step.id,
+            title: step.title,
+            desc: step.script || step.value || '',
+            icon: getIcon(step.component),
+            color: getColor(step.component),
+          };
+        })
+      : defaultNodes;
+
+    const COLUMNS = 3;
+    const CARD_WIDTH = 256;
+    const CARD_HEIGHT = 200;
+    const GAP_X = 60;
+    const GAP_Y = 80;
+    const PADDING = 60;
+
+    const positionedNodes = rawNodes.map((node, index) => {
+      const row = Math.floor(index / COLUMNS);
+      const col = index % COLUMNS;
+      const isEvenRow = row % 2 === 0;
+      const effectiveCol = isEvenRow ? col : (COLUMNS - 1 - col);
+
+      return {
+        ...node,
+        x: PADDING + effectiveCol * (CARD_WIDTH + GAP_X),
+        y: PADDING + row * (CARD_HEIGHT + GAP_Y),
+        row,
+        col: effectiveCol,
+      };
+    });
+
+    const totalRows = Math.ceil(positionedNodes.length / COLUMNS);
+    const containerWidth = PADDING * 2 + COLUMNS * CARD_WIDTH + (COLUMNS - 1) * GAP_X;
+    const containerHeight = PADDING * 2 + totalRows * CARD_HEIGHT + (totalRows - 1) * GAP_Y;
+
+    const sequentialEdges = positionedNodes.slice(0, -1).map((n, i) => ({ from: n.id, to: positionedNodes[i + 1].id }));
+    return { nodes: positionedNodes, edges: sequentialEdges, containerWidth, containerHeight, cardWidth: CARD_WIDTH, cardHeight: CARD_HEIGHT };
+  }, [demo.id, demo.steps, defaultNodes, inspectionFlow]);
+
+  const nodeById = useMemo(() => new Map(nodes.map(n => [n.id, n])), [nodes]);
 
   return (
     <div className="flex-1 flex h-full bg-[color:var(--bg-body)] overflow-hidden relative font-sans">
@@ -137,39 +250,47 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
       <div className="flex-1 relative overflow-auto bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:20px_20px] flex items-center justify-center">
          <div className="relative" style={{ width: containerWidth, height: containerHeight }}>
             {/* Edges */}
-            {nodes.slice(0, -1).map((node, i) => {
-              const nextNode = nodes[i+1];
-              const isVertical = node.row !== nextNode.row;
-              
-              // Calculate connection points
-              let startX, startY, endX, endY;
+            {edges.map((edge, i) => {
+              const from = nodeById.get(edge.from);
+              const to = nodeById.get(edge.to);
+              if (!from || !to) return null;
+
+              const isVertical = from.y !== to.y;
+
+              let startX: number;
+              let startY: number;
+              let endX: number;
+              let endY: number;
 
               if (isVertical) {
-                // Connecting from bottom of current to top of next
-                startX = node.x + CARD_WIDTH / 2;
-                startY = node.y + CARD_HEIGHT; // Bottom of card
-                endX = nextNode.x + CARD_WIDTH / 2;
-                endY = nextNode.y; // Top of card
-              } else {
-                // Horizontal connection
-                if (node.col < nextNode.col) {
-                  // L -> R
-                  startX = node.x + CARD_WIDTH;
-                  startY = node.y + CARD_HEIGHT / 2;
-                  endX = nextNode.x;
-                  endY = nextNode.y + CARD_HEIGHT / 2;
+                if (from.y < to.y) {
+                  startX = from.x + cardWidth / 2;
+                  startY = from.y + cardHeight;
+                  endX = to.x + cardWidth / 2;
+                  endY = to.y;
                 } else {
-                  // R -> L
-                  startX = node.x;
-                  startY = node.y + CARD_HEIGHT / 2;
-                  endX = nextNode.x + CARD_WIDTH;
-                  endY = nextNode.y + CARD_HEIGHT / 2;
+                  startX = from.x + cardWidth / 2;
+                  startY = from.y;
+                  endX = to.x + cardWidth / 2;
+                  endY = to.y + cardHeight;
+                }
+              } else {
+                if (from.x < to.x) {
+                  startX = from.x + cardWidth;
+                  startY = from.y + cardHeight / 2;
+                  endX = to.x;
+                  endY = to.y + cardHeight / 2;
+                } else {
+                  startX = from.x;
+                  startY = from.y + cardHeight / 2;
+                  endX = to.x + cardWidth;
+                  endY = to.y + cardHeight / 2;
                 }
               }
 
               return (
-                <FlowEdge 
-                  key={i}
+                <FlowEdge
+                  key={`${edge.from}-${edge.to}-${i}`}
                   startX={startX}
                   startY={startY}
                   endX={endX}
@@ -191,15 +312,26 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
                <span className="text-xs font-semibold text-[color:var(--text-2)]">流程引擎运行中</span>
             </div>
          </div>
+
+         {/* Right Panel Toggle */}
+         {!isRightPanelOpen && (
+           <button
+             onClick={() => setIsRightPanelOpen(true)}
+             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20 ui-btn ui-btn-secondary h-10 px-5 text-xs font-semibold"
+           >
+             打开流程说明
+           </button>
+         )}
       </div>
 
       {/* Right Sidebar */}
+      {isRightPanelOpen && (
       <div className="w-[360px] bg-[color:var(--bg-surface-1)] border-l border-[color:var(--border)] shadow-xl z-30 flex flex-col">
         {/* Header */}
-        <div className="h-16 border-b border-[color:var(--border)] flex items-center justify-between px-6">
+        <div className="h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 md:px-6">
            <div className="flex items-center gap-2">
              <span className="ui-tag px-2 py-0.5 text-[10px] bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] border-[color:var(--border)]">Flow</span>
-             <h3 className="text-sm font-bold text-[color:var(--text)]">业务流程编排</h3>
+             <h3 className="text-sm font-bold text-[color:var(--text)] whitespace-nowrap">业务流程编排</h3>
            </div>
         </div>
 
@@ -244,14 +376,21 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
              onClick={onEnterApp}
              className="w-full ui-btn ui-btn-primary h-12 text-sm shadow-lg shadow-[color:var(--primary)]/20 hover:shadow-[color:var(--primary)]/30 transition-all transform active:scale-95 flex items-center justify-center gap-2 text-white"
            >
-             <IconPlay />
+             <Play size={16} />
              进入应用
            </button>
            <p className="text-center mt-3 text-[10px] text-[color:var(--text-3)]">
              点击即可进入应用模式体验真实交互
            </p>
+           <button
+             onClick={() => setIsRightPanelOpen(false)}
+             className="w-full mt-4 ui-btn ui-btn-secondary h-10 text-xs"
+           >
+             收起流程说明
+           </button>
         </div>
       </div>
+      )}
     </div>
   );
 };

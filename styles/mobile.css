@@ -1,0 +1,379 @@
+/**
+ * 移动端专用样式文件
+ * 针对屏幕宽度 < 768px 的设备进行优化
+ * 遵循 Apple HIG 规范和现代移动端设计原则
+ */
+
+/* ========== 全局移动端优化 ========== */
+
+/* 防止横向滚动 */
+@media (max-width: 767px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  /* 基础字号调整 - 确保正文至少16px */
+  body {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  /* 触控目标最小尺寸 44x44px */
+  button, a, .ui-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 16px;
+  }
+  
+  /* 输入框触控优化 */
+  input, textarea, select {
+    min-height: 44px;
+    font-size: 16px; /* 防止iOS自动缩放 */
+  }
+}
+
+/* ========== 导航栏移动端优化 ========== */
+
+@media (max-width: 767px) {
+  /* 导航栏高度调整 */
+  header {
+    height: 56px !important;
+    padding: 0 12px !important;
+  }
+  
+  /* Logo尺寸调整 */
+  header img[alt="Logo"] {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  /* 隐藏桌面端导航文字 */
+  header h1, header span {
+    display: none;
+  }
+  
+  /* 导航按钮优化 */
+  nav button {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  
+  /* 退出按钮优化 */
+  .ui-btn[onclick*="handleReset"] {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+}
+
+/* ========== 卡片布局移动端优化 ========== */
+
+@media (max-width: 767px) {
+  /* Demo卡片优化 */
+  .ui-card {
+    border-radius: var(--radius-xl); /* Softer corners */
+    padding: 20px; /* More breathing room */
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-md); /* Softer shadow */
+    border: 1px solid var(--border-subtle); /* Subtle border */
+  }
+  
+  /* 卡片标题字号 */
+  .ui-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  
+  /* 卡片描述字号 */
+  .ui-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+  
+  /* 卡片列表项字号 */
+  .ui-card li {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  /* 卡片底部按钮 */
+  .ui-card button {
+    width: 100%;
+    min-height: 48px; /* Larger touch target */
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* ========== 网格布局移动端优化 ========== */
+
+@media (max-width: 767px) {
+  /* 移除强制单列布局，使用 Tailwind 类名控制 */
+  /* .grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  } */
+  
+  /* 卡片容器 */
+  .ui-card.group {
+    min-height: auto;
+    height: auto;
+  }
+  
+  /* 图片自适应 */
+  .ui-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+}
+
+/* ========== 侧边栏移动端优化 (已移除，使用 App.tsx 中的 Bottom Sheet 逻辑) ========== */
+
+/* 
+@media (max-width: 767px) {
+  aside {
+     ...
+  }
+} 
+*/
+
+/* ========== 表格移动端优化 ========== */
+
+@media (max-width: 767px) {
+  /* 表格容器横向滚动 */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 表格单元格字号 */
+  .base-cell {
+    font-size: 14px;
+    padding: 8px 12px;
+    min-height: 44px;
+  }
+  
+  /* 表格行高 */
+  tr {
+    min-height: 44px;
+  }
+}
+
+/* ========== 按钮移动端优化 ========== */
+
+@media (max-width: 767px) {
+  /* 主按钮全宽 */
+  .ui-btn-primary {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: var(--radius-lg);
+  }
+  
+  /* 次要按钮全宽 */
+  .ui-btn-secondary {
+    width: 100%;
+    min-height: 44px;
+    font-size: 15px;
+    border-radius: var(--radius-lg);
+  }
+  
+  /* 幽灵按钮 */
+  .ui-btn-ghost {
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+}
+
+/* ========== 表单移动端优化 ========== */
+
+@media (max-width: 767px) {
+  /* 表单容器 */
+  form {
+    padding: 16px;
+  }
+  
+  /* 表单标签 */
+  label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  /* 表单输入框 */
+  .ui-input {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+  
+  /* 表单间距 */
+  .form-group {
+    margin-bottom: 20px;
+  }
+}
+
+/* ========== 消息气泡移动端优化 ========== */
+
+@media (max-width: 767px) {
+  /* 消息容器 */
+  .message-container {
+    padding: 16px;
+  }
+  
+  /* 消息气泡 */
+  .message-bubble {
+    max-width: 85%;
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.6;
+    border-radius: 16px;
+  }
+  
+  /* AI消息气泡 */
+  .message-bubble.ai {
+    background: var(--bg-surface-2);
+    border-bottom-left-radius: 4px;
+  }
+  
+  /* 用户消息气泡 */
+  .message-bubble.user {
+    background: var(--primary);
+    border-bottom-right-radius: 4px;
+  }
+}
+
+/* ========== 滚动条隐藏 ========== */
+
+@media (max-width: 767px) {
+  /* 隐藏滚动条但保持滚动功能 */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ========== 文字截断优化 ========== */
+
+@media (max-width: 767px) {
+  /* 单行截断 */
+  .truncate-1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* 两行截断 */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* 三行截断 */
+  .truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ========== 间距优化 ========== */
+
+@media (max-width: 767px) {
+  /* 增加垂直间距 */
+  section {
+    margin-bottom: 24px;
+    padding: 16px;
+  }
+  
+  /* 卡片间距 */
+  .ui-card + .ui-card {
+    margin-top: 16px;
+  }
+  
+  /* 列表间距 */
+  ul, ol {
+    gap: 12px;
+  }
+}
+
+/* ========== 动画优化 ========== */
+
+@media (max-width: 767px) {
+  /* 减少动画时长 */
+  .ui-card, .ui-btn, button, a {
+    transition-duration: 200ms;
+  }
+  
+  /* 禁用hover效果（移动端无hover） */
+  @media (hover: none) {
+    .ui-card:hover,
+    .ui-btn:hover,
+    button:hover,
+    a:hover {
+      transform: none;
+    }
+  }
+}
+
+/* ========== 安全区域适配 ========== */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  @media (max-width: 767px) {
+    /* 底部安全区域 */
+    .safe-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* 底部导航栏 */
+    .bottom-nav {
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+    
+    /* 顶部安全区域 */
+    .safe-top {
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+}
+
+/* ========== 横屏优化 ========== */
+
+@media (max-width: 767px) and (orientation: landscape) {
+  /* 减少垂直间距 */
+  section {
+    margin-bottom: 16px;
+    padding: 12px;
+  }
+  
+  /* 调整导航栏高度 */
+  header {
+    height: 48px !important;
+  }
+  
+  /* 调整卡片内边距 */
+  .ui-card {
+    padding: 12px;
+  }
+}

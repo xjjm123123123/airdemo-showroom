@@ -1,4 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
+import { 
+  LayoutGrid, 
+  MessageSquare, 
+  Settings, 
+  Menu, 
+  X, 
+  Send, 
+  Sparkles, 
+  ChevronRight, 
+  ChevronDown, 
+  Search, 
+  Plus, 
+  MoreHorizontal,
+  Home,
+  ArrowRight,
+  Zap,
+  Clock,
+  ArrowUpRight
+} from 'lucide-react';
+import { DEMO_LIST, EFFICIENCY_TOOLS, PROMPT_TEMPLATES, INSPECTION_COVER_URL, GTM_COVER_URL } from './constants';
 import Catalog from './views/Catalog';
 import Workspace from './views/Workspace';
 import DemoFlow from './views/DemoFlow';
@@ -6,25 +26,14 @@ import Efficiency from './views/Efficiency';
 import Prism from './components/Prism';
 import TextType from './components/TextType';
 import { Demo } from './types';
-import { DEMO_LIST, EFFICIENCY_TOOLS } from './constants';
 
 type AppId = 'home' | 'demo' | 'efficiency';
 type WorkspaceViewId = 'main' | 'management' | 'equipment' | 'factory';
 
-// Icons
-const IconHome = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>;
-const IconGrid = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
-const IconZap = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>;
-const IconClock = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>;
-const IconArrowRight = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
-const IconArrowUpRight = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>;
-const IconMessage = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
-const IconSend = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>;
-const IconChevronDown = ({ className = '' }: { className?: string }) => (
-  <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
-);
+type Message = {
+  role: 'user' | 'ai';
+  text: string;
+};
 
 const AI_NAVIGATOR_URL = 'https://www.ailinghangzhe.cn';
 
@@ -33,30 +42,23 @@ const App: React.FC = () => {
   const [currentApp, setCurrentApp] = useState<AppId>('home');
   const [workspaceInitialView, setWorkspaceInitialView] = useState<WorkspaceViewId>('main');
   const [demoViewMode, setDemoViewMode] = useState<'flow' | 'workspace'>('flow');
-  const [isHomeChatCollapsed, setIsHomeChatCollapsed] = useState(true);
-  const [homeMessages, setHomeMessages] = useState<{ role: 'ai' | 'user'; text: string }[]>([
-    { role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }
-  ]);
+  const [homeMessages, setHomeMessages] = useState<Message[]>([{ role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }]);
   const [homeInput, setHomeInput] = useState('');
+  const [isHomeChatCollapsed, setIsHomeChatCollapsed] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleGoHome = () => {
     setSelectedDemo(null);
     setCurrentApp('home');
+    setDemoViewMode('flow');
+    setIsMobileMenuOpen(false);
   };
 
   const handleReset = () => {
     setSelectedDemo(null);
-    setCurrentApp('demo');
-    setWorkspaceInitialView('main');
     setDemoViewMode('flow');
+    setIsMobileMenuOpen(false);
   };
-
-  const inspectionDemo = DEMO_LIST.find((d) => d.id === 'inspection');
-  
-  const INSPECTION_COVER_URL =
-    'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%886.50.56.png';
-  const GTM_COVER_URL =
-    'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%883.35.20.png';
 
   const openEfficiencyTool = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -70,7 +72,7 @@ const App: React.FC = () => {
     if (t.includes('睿睿') || lower.includes('ruirui')) return '睿睿适合做汇报复盘：金句、干系人洞察、故事线与案例推荐。';
     if (t.includes('巡检') || t.includes('智能巡检') || lower.includes('inspection')) return '点击「AI 智能巡检」卡片即可进入演示。';
     if (t.includes('推荐') || t.includes('怎么选')) return '给我 3 个信息：行业 / 角色 / 痛点，我给你推荐路径。';
-    return '收到。也可以直接点「最新 Demo / 最新数字员工」卡片快速进入。';
+    return '收到。也可以直接点「最新 Demo / 最新数字伙伴」卡片快速进入。';
   };
 
   const sendHomeMessage = () => {
@@ -86,14 +88,14 @@ const App: React.FC = () => {
       ? '首页' 
       : currentApp === 'demo'
         ? 'Demo中心'
-        : '数字员工';
+        : '数字伙伴';
 
   const isLightMode = currentApp === 'demo' && selectedDemo && demoViewMode === 'workspace';
 
   const apps: { id: AppId; name: string; icon: React.ReactNode }[] = [
-    { id: 'home', name: '首页', icon: <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_32_47%201.png" alt="首页" className="w-4 h-4 object-contain" /> },
-    { id: 'demo', name: 'Demo中心', icon: <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_31_10%201.png" alt="Demo" className="w-4 h-4 object-contain" /> },
-    { id: 'efficiency', name: '数字员工', icon: <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_31_37%201.png" alt="数字员工" className="w-4 h-4 object-contain" /> }
+    { id: 'home', name: '首页', icon: <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_32_47%201.png" alt="首页" className="w-4 h-4 object-contain" loading="lazy" /> },
+    { id: 'demo', name: 'Demo中心', icon: <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_31_10%201.png" alt="Demo" className="w-4 h-4 object-contain" loading="lazy" /> },
+    { id: 'efficiency', name: '数字伙伴', icon: <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_31_37%201.png" alt="数字伙伴" className="w-4 h-4 object-contain" loading="lazy" /> }
   ];
 
   return (
@@ -109,6 +111,7 @@ const App: React.FC = () => {
           colorFrequency={1} 
           noise={0} 
           glow={1} 
+          suspendWhenOffscreen={true}
         /> 
       </div>
       <header className="h-14 border-b border-[color:var(--border)] flex items-center justify-between px-4 lg:px-6 bg-[color:var(--bg-surface-1)] flex-shrink-0 z-50 relative">
@@ -117,7 +120,8 @@ const App: React.FC = () => {
             <img 
               src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/Lark_Suite_logo_2022%201_%E5%89%AF%E6%9C%AC.png" 
               alt="Logo" 
-              className="w-8 h-8 object-contain transition-transform group-hover:scale-105" 
+              className="w-8 h-8 object-contain transition-transform group-hover:scale-105"
+              loading="lazy"
             />
             <div className="flex flex-col leading-tight hidden sm:flex">
               <h1 className="font-semibold text-sm text-[color:var(--text)] tracking-tight">AirDemo</h1>
@@ -125,7 +129,8 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          <nav className="flex items-center gap-1 ml-4 lg:ml-6 overflow-x-auto no-scrollbar mask-gradient-r">
+          {/* 桌面端导航菜单 */}
+          <nav className="hidden lg:flex items-center gap-1 ml-4 lg:ml-6 overflow-x-auto no-scrollbar mask-gradient-r">
             {apps.map(app => (
               <button
                 key={app.id}
@@ -142,7 +147,7 @@ const App: React.FC = () => {
                   }
                   setCurrentApp(app.id);
                 }}
-                className={`ui-btn ui-btn-ghost px-3 h-8 gap-2 text-xs whitespace-nowrap flex-shrink-0 ${currentApp === app.id ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] font-medium' : 'text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)]'}`}
+                className={`ui-btn ui-btn-ghost px-3 h-8 gap-2 text-xs whitespace-nowrap flex-shrink-0 rounded-[var(--radius-md)] ${currentApp === app.id ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] font-medium' : 'text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)]'}`}
               >
                 {app.icon}
                 {app.name}
@@ -153,15 +158,28 @@ const App: React.FC = () => {
               href={AI_NAVIGATOR_URL}
               target="_blank"
               rel="noreferrer"
-              className="ui-btn ui-btn-ghost px-3 h-8 gap-2 text-xs whitespace-nowrap flex-shrink-0 text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)]"
+              className="ui-btn ui-btn-ghost px-3 h-8 gap-2 text-xs whitespace-nowrap flex-shrink-0 text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)] rounded-[var(--radius-md)]"
             >
-              <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_36_28%201.png" alt="AI领航者" className="w-4 h-4 object-contain" />
+              <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_36_28%201.png" alt="AI领航者" className="w-4 h-4 object-contain" loading="lazy" />
               AI领航者
             </a>
           </nav>
+
+          {/* 移动端汉堡菜单按钮 */}
+          <button
+            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-[var(--radius-md)] hover:bg-[color:var(--bg-surface-2)] transition-colors ml-auto"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="打开菜单"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6 text-[color:var(--text)]" />
+            ) : (
+              <Menu className="w-6 h-6 text-[color:var(--text)]" />
+            )}
+          </button>
         </div>
 
-        <div className="flex items-center gap-3 lg:gap-4 flex-shrink-0 ml-4">
+        <div className="hidden lg:flex items-center gap-3 lg:gap-4 flex-shrink-0 ml-4">
           {selectedDemo && (
             <button onClick={handleReset} className="ui-btn border border-[color:var(--border)] h-8 text-xs px-3 whitespace-nowrap hover:bg-[color:var(--danger-subtle)] hover:text-[color:var(--danger)] hover:border-[color:var(--danger)] transition-all">
               <span className="hidden sm:inline">退出演示</span>
@@ -174,6 +192,64 @@ const App: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* 移动端菜单遮罩 */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* 移动端菜单面板 */}
+      {isMobileMenuOpen && (
+        <div className="fixed top-14 right-0 left-0 bg-[color:var(--bg-surface-1)] border-b border-[color:var(--border)] z-50 lg:hidden shadow-xl">
+          <div className="p-4 space-y-2">
+            {apps.map(app => (
+              <button
+                key={app.id}
+                onClick={() => {
+                  if (app.id === 'home') {
+                    handleGoHome();
+                  } else if (app.id === 'efficiency' && selectedDemo) {
+                     setDemoViewMode('workspace');
+                  } else if (app.id === 'demo') {
+                    setSelectedDemo(null);
+                  }
+                  setCurrentApp(app.id);
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full ui-btn ui-btn-ghost px-4 h-12 gap-3 text-sm flex items-center justify-start ${currentApp === app.id ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] font-medium' : 'text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)]'}`}
+              >
+                {app.icon}
+                {app.name}
+              </button>
+            ))}
+
+            <a
+              href={AI_NAVIGATOR_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full ui-btn ui-btn-ghost px-4 h-12 gap-3 text-sm flex items-center justify-start text-[color:var(--text-2)] font-normal hover:text-[color:var(--text)]"
+            >
+              <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_36_28%201.png" alt="AI领航者" className="w-4 h-4 object-contain" />
+              AI领航者
+            </a>
+
+            {selectedDemo && (
+              <button 
+                onClick={() => {
+                  handleReset();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full ui-btn border border-[color:var(--border)] h-12 text-sm px-4 hover:bg-[color:var(--danger-subtle)] hover:text-[color:var(--danger)] hover:border-[color:var(--danger)] transition-all"
+              >
+                退出演示
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <main className={`flex-1 flex flex-col lg:flex-row overflow-hidden relative z-10 ${isLightMode ? 'light-theme' : ''}`}>
         {currentApp === 'efficiency' ? (
@@ -189,9 +265,9 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto no-scrollbar p-6 lg:p-8 pb-24 lg:pb-12">
               <div className="max-w-6xl mx-auto space-y-8 lg:space-y-10">
                 <section className="ui-card overflow-hidden border border-[color:var(--border)] shadow-[var(--shadow-sm)]">
-                  <div className="px-8 py-10 lg:px-16 lg:py-16 relative overflow-hidden">
+                  <div className="px-6 py-8 sm:px-8 sm:py-10 lg:px-16 lg:py-16 relative overflow-hidden">
                     <div className="max-w-3xl relative z-10">
-                      <h2 className="text-3xl lg:text-4xl font-semibold text-[color:var(--text)] tracking-tight leading-tight min-h-[3em]">
+                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-[color:var(--text)] tracking-tight leading-tight min-h-[3em]">
                         <TextType
                           text={['欢迎来到\n飞书 AI 解决方案样板间']}
                           typingSpeed={100}
@@ -200,22 +276,22 @@ const App: React.FC = () => {
                           showCursor={true}
                         />
                       </h2>
-                      <p className="mt-4 lg:mt-6 text-base lg:text-lg text-[color:var(--text-2)] leading-relaxed max-w-2xl font-normal">
+                      <p className="mt-4 lg:mt-6 text-sm sm:text-base lg:text-lg text-[color:var(--text-2)] leading-relaxed max-w-2xl font-normal">
                         用最短路径把客户需求翻译成方案故事线：<br/>数据结构化 → AI 洞察 → 行动闭环。
                       </p>
-                      <div className="mt-8 lg:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 lg:gap-4">
+                      <div className="mt-6 sm:mt-8 lg:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 lg:gap-4">
                         <button
                           onClick={() => setCurrentApp('demo')}
-                          className="ui-btn ui-btn-primary h-9 px-6 text-sm justify-center font-medium transition-transform active:scale-95"
+                          className="ui-btn ui-btn-primary h-9 px-6 text-sm justify-center font-medium transition-transform active:scale-95 rounded-[var(--radius-lg)]"
                         >
                           开始探索
-                          <IconArrowRight />
+                          <ArrowRight size={14} />
                         </button>
                         <button
                           onClick={() => setCurrentApp('efficiency')}
-                          className="ui-btn ui-btn-secondary h-9 px-6 text-sm justify-center font-medium transition-colors"
+                          className="ui-btn ui-btn-secondary h-9 px-6 text-sm justify-center font-medium transition-colors rounded-[var(--radius-lg)]"
                         >
-                          打开数字员工
+                          打开数字伙伴
                         </button>
                       </div>
                     </div>
@@ -226,111 +302,122 @@ const App: React.FC = () => {
                         src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2000_09_48.png" 
                         alt="" 
                         className="max-w-full max-h-full object-contain transform scale-[1.15]"
+                        loading="lazy"
                       />
                     </div>
                   </div>
                 </section>
 
                 <section>
-                  <div className="flex items-center justify-between mb-4 lg:mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text)] shadow-sm">
-                        <IconClock />
+                  <div className="flex items-center justify-between mb-4 sm:mb-5 lg:mb-6">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text)] shadow-sm">
+                        <Clock size={16} />
                       </div>
-                      <h3 className="text-base font-semibold text-[color:var(--text)] tracking-tight">最新 Demo</h3>
+                      <h3 className="text-sm sm:text-base font-semibold text-[color:var(--text)] tracking-tight">最新 Demo</h3>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                     {DEMO_LIST.map((demo) => (
-                      <button
+                      <div
                         key={demo.id}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => {
                           setWorkspaceInitialView('main');
                           setSelectedDemo(demo);
                           setCurrentApp('demo');
                           setDemoViewMode('flow');
                         }}
-                        className="ui-card group overflow-hidden text-left relative hover:shadow-2xl transition-all duration-500 border-0 bg-white h-[320px] flex flex-col"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            setWorkspaceInitialView('main');
+                            setSelectedDemo(demo);
+                            setCurrentApp('demo');
+                            setDemoViewMode('flow');
+                          }
+                        }}
+                        className="ui-card group overflow-hidden text-left relative hover:shadow-[var(--shadow-lg)] transition-all duration-500 border-0 bg-[color:var(--bg-surface-1)] h-[280px] sm:h-[320px] flex flex-col rounded-[var(--radius-xl)] cursor-pointer"
                       >
                         <div className="absolute inset-0 z-0">
                            {demo.id === 'inspection' ? (
-                            <img src={INSPECTION_COVER_URL} alt="" className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                            <img src={INSPECTION_COVER_URL} alt="" className="absolute inset-0 !w-full !h-full !max-w-none object-cover object-top transition-transform duration-700 group-hover:scale-105 block" loading="lazy" />
                           ) : demo.id === 'gtm' ? (
-                            <img src={GTM_COVER_URL} alt="" className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+                            <img src={GTM_COVER_URL} alt="" className="absolute inset-0 !w-full !h-full !max-w-none object-cover object-top transition-transform duration-700 group-hover:scale-105 block" loading="lazy" />
                           ) : (
-                            <div className="w-full h-full bg-slate-100 flex items-center justify-center">
-                              <IconGrid />
+                            <div className="w-full h-full bg-[color:var(--bg-subtle)] flex items-center justify-center">
+                              <LayoutGrid size={16} />
                             </div>
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
                         </div>
                         
-                        <div className="relative z-10 p-6 flex flex-col h-full justify-end text-white">
+                        <div className="relative z-10 p-4 sm:p-6 flex flex-col h-full justify-end text-white">
                           <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                             <div className="flex items-center gap-2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
                                <span className="px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-[10px] font-medium tracking-wide">
                                  方案 Demo
                                </span>
                             </div>
-                            <h4 className="text-xl lg:text-2xl font-bold mb-2 text-white leading-tight shadow-sm">{demo.title}</h4>
-                            <p className="text-sm text-white/80 line-clamp-2 leading-relaxed font-light mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <h4 className="text-lg sm:text-xl lg:text-2xl font-bold mb-2 text-white leading-tight shadow-sm">{demo.title}</h4>
+                            <p className="text-xs sm:text-sm text-white/80 line-clamp-2 leading-relaxed font-light mb-3 sm:mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
                               {demo.valueProp}
                             </p>
-                            <div className="flex items-center gap-2 text-xs font-medium text-white/90 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                            <div className="flex items-center gap-2 text-[10px] sm:text-xs font-medium text-white/90 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
                               <span>进入体验</span>
-                              <IconArrowRight />
+                              <ArrowRight size={14} />
                             </div>
                           </div>
                         </div>
-                      </button>
+                      </div>
                     ))}
 
-                    <div className="ui-card overflow-hidden text-left bg-[color:var(--bg-subtle)] border border-dashed border-[color:var(--border)] hover:border-[color:var(--text-3)] cursor-default flex flex-col justify-center items-center text-center p-8 h-[320px] backdrop-blur-sm transition-colors group">
-                      <div className="w-12 h-12 rounded-full bg-[color:var(--surface)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-3)] mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <IconGrid />
+                    <div className="ui-card overflow-hidden text-left bg-[color:var(--bg-subtle)] border border-dashed border-[color:var(--border)] hover:border-[color:var(--text-3)] cursor-default flex flex-col justify-center items-center text-center p-6 sm:p-8 h-[280px] sm:h-[320px] backdrop-blur-sm transition-colors group rounded-[var(--radius-xl)]">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[color:var(--surface)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-3)] mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <LayoutGrid size={16} />
                       </div>
-                      <h4 className="text-sm font-medium text-[color:var(--text)] mb-2">更多 Demo 正在制作</h4>
-                      <p className="text-xs text-[color:var(--text-3)] max-w-[200px] leading-relaxed">后续会持续补充更多行业与角色场景。</p>
+                      <h4 className="text-xs sm:text-sm font-medium text-[color:var(--text)] mb-2">更多 Demo 正在制作</h4>
+                      <p className="text-[10px] sm:text-xs text-[color:var(--text-3)] max-w-[200px] leading-relaxed">后续会持续补充更多行业与角色场景。</p>
                     </div>
                   </div>
                 </section>
 
                 <section>
-                  <div className="flex items-center justify-between mb-6 lg:mb-8">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-[color:var(--bg-subtle)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text)] shadow-sm">
-                        <IconZap />
+                  <div className="flex items-center justify-between mb-5 sm:mb-6 lg:mb-8">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[color:var(--bg-subtle)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text)] shadow-sm">
+                        <Zap size={16} />
                       </div>
-                      <h3 className="text-lg font-semibold text-[color:var(--text)] tracking-tight">最新数字员工</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-[color:var(--text)] tracking-tight">最新数字伙伴</h3>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     {EFFICIENCY_TOOLS.map((tool) => (
-                      <div key={tool.id} className="ui-card p-5 lg:p-6 hover:border-[color:var(--border-strong)] hover:bg-[color:var(--bg-surface-2)] transition-all duration-300 group flex flex-col h-full">
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center overflow-hidden flex-shrink-0">
+                      <div key={tool.id} className="ui-card overflow-hidden p-4 sm:p-5 lg:p-6 hover:border-[color:var(--border-strong)] hover:bg-[color:var(--bg-surface-2)] transition-all duration-300 group flex flex-col h-full items-start sm:items-center text-left sm:text-center rounded-[var(--radius-xl)]">
+                        <div className="flex flex-row sm:flex-col items-center gap-3 sm:gap-4 mb-3 sm:mb-4 w-full">
+                          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center overflow-hidden flex-shrink-0">
                              {tool.avatarUrl ? (
-                               <img src={tool.avatarUrl} alt={tool.name} className="w-full h-full object-cover" />
+                               <img src={tool.avatarUrl} alt={tool.name} className="w-full h-full object-cover" loading="lazy" />
                              ) : (
-                               <IconZap />
+                               <Zap size={16} />
                              )}
                           </div>
-                          <div>
-                             <h3 className="text-base font-semibold text-[color:var(--text)]">{tool.title}</h3>
-                             <span className="text-xs text-[color:var(--text-2)]">{tool.name}</span>
+                          <div className="w-full px-2 flex-1">
+                             <h3 className="text-sm sm:text-base font-semibold text-[color:var(--text)] truncate w-full">{tool.title}</h3>
+                             <span className="text-[10px] sm:text-xs text-[color:var(--text-2)] block truncate w-full">{tool.name}</span>
                           </div>
                         </div>
                         
-                        <div className="bg-[color:var(--bg-surface-2)] rounded-[var(--radius-md)] p-3 border border-[color:var(--border)] text-xs text-[color:var(--text-2)] leading-relaxed mb-4 flex-grow">
-                          “{tool.highlight}”
+                        <div className="bg-[color:var(--bg-surface-2)] rounded-[var(--radius-md)] p-2.5 sm:p-3 border border-[color:var(--border)] text-[10px] sm:text-xs text-[color:var(--text-2)] leading-relaxed mb-3 sm:mb-4 flex-grow w-full break-words">
+                          "{tool.highlight}"
                         </div>
 
-                        <div className="flex items-center justify-between mt-auto">
-                           <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap items-center justify-start sm:justify-center mt-auto w-full gap-2 sm:gap-3">
+                           <div className="flex flex-wrap gap-1 sm:gap-1.5 justify-start sm:justify-center max-w-full">
                             {tool.skills.slice(0, 1).map((s) => (
-                              <span key={s} className="px-1.5 py-0.5 rounded border border-[color:var(--border)] bg-[color:var(--bg-surface-1)] text-[10px] text-[color:var(--text-2)] truncate max-w-[100px]">
+                              <span key={s} className="px-1.5 py-0.5 rounded border border-[color:var(--border)] bg-[color:var(--bg-surface-1)] text-[10px] text-[color:var(--text-2)] truncate max-w-[80px] sm:max-w-[100px]">
                                 {s}
                               </span>
                             ))}
@@ -339,7 +426,7 @@ const App: React.FC = () => {
                             href={tool.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="ui-btn ui-btn-primary px-3 h-7 text-xs flex-shrink-0 ml-2"
+                            className="ui-btn ui-btn-primary px-3 h-8 text-xs flex-shrink-0 sm:px-5 sm:h-9 sm:text-sm rounded-[var(--radius-lg)]"
                           >
                             打开
                           </a>
@@ -347,12 +434,12 @@ const App: React.FC = () => {
                       </div>
                     ))}
 
-                    <div className="ui-card overflow-hidden text-left bg-[color:var(--bg-subtle)] border border-dashed border-[color:var(--border)] hover:border-[color:var(--text-3)] cursor-default flex flex-col justify-center items-center text-center p-8 h-full min-h-[200px] backdrop-blur-sm transition-colors group">
-                      <div className="w-12 h-12 rounded-full bg-[color:var(--surface)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-3)] mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <IconZap />
+                    <div className="ui-card overflow-hidden text-left bg-[color:var(--bg-subtle)] border border-dashed border-[color:var(--border)] hover:border-[color:var(--text-3)] cursor-default flex flex-col justify-center items-center text-center p-6 sm:p-8 h-full min-h-[180px] sm:min-h-[200px] backdrop-blur-sm transition-colors group rounded-[var(--radius-xl)]">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[color:var(--surface)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-3)] mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <Zap size={16} />
                       </div>
-                      <h4 className="text-sm font-medium text-[color:var(--text)] mb-2">更多数字员工敬请期待</h4>
-                      <p className="text-xs text-[color:var(--text-3)] max-w-[200px] leading-relaxed">持续补充更多场景助手。</p>
+                      <h4 className="text-xs sm:text-sm font-medium text-[color:var(--text)] mb-2">更多数字伙伴敬请期待</h4>
+                      <p className="text-[10px] sm:text-xs text-[color:var(--text-3)] max-w-[200px] leading-relaxed">持续补充更多场景助手。</p>
                     </div>
                   </div>
                 </section>
@@ -360,47 +447,48 @@ const App: React.FC = () => {
             </div>
 
             <aside
-              className={`w-full lg:w-[360px] h-[300px] lg:h-auto border-t lg:border-t-0 lg:border-l border-[color:var(--border)] ui-card rounded-none lg:rounded-none border-0 lg:border-l flex flex-col flex-shrink-0 shadow-[var(--shadow-xl)] z-40 lg:relative absolute bottom-0 lg:bottom-auto transition-transform duration-300 transform backdrop-blur-xl lg:translate-y-0 ${isHomeChatCollapsed ? 'translate-y-[252px]' : 'translate-y-0'}`}
+              className={`lg:w-[360px] lg:h-auto flex flex-col flex-shrink-0 z-40 lg:relative fixed top-[64px] lg:top-auto lg:right-auto lg:left-auto bottom-auto transition-all duration-300 ease-in-out backdrop-blur-xl ${
+                isHomeChatCollapsed
+                  ? 'w-10 h-10 rounded-full right-4 left-auto bg-[color:var(--primary)] shadow-lg border-0 items-center justify-center overflow-hidden'
+                  : 'w-[calc(100%-32px)] h-[400px] right-4 left-4 rounded-2xl bg-[color:var(--bg-surface-1)] shadow-[var(--shadow-xl)] border border-[color:var(--border)]'
+              } lg:bg-transparent lg:shadow-[var(--shadow-xl)] lg:border lg:border-t-0 lg:border-l lg:border-[color:var(--border)] lg:rounded-none lg:items-stretch lg:justify-start lg:overflow-visible ui-card`}
             >
-              <div className="h-12 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 lg:px-6 bg-transparent">
+              <div className={`h-12 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 lg:px-6 bg-transparent flex-shrink-0 ${isHomeChatCollapsed ? 'border-0 p-0 justify-center w-full h-full' : ''}`}>
                 <button
                   type="button"
                   onClick={() => setIsHomeChatCollapsed((v) => !v)}
-                  className="flex items-center gap-2 text-sm font-bold text-[color:var(--text)] min-w-0 lg:pointer-events-none"
+                  className={`flex items-center gap-2 text-sm font-bold text-[color:var(--text)] min-w-0 lg:pointer-events-none w-full lg:w-auto ${isHomeChatCollapsed ? 'justify-center h-full text-white' : ''}`}
                   aria-label={isHomeChatCollapsed ? '展开首页 AI 助手' : '折叠首页 AI 助手'}
                 >
-                  <IconMessage />
-                  <span>首页 AI 助手</span>
-                  <IconChevronDown className={`lg:hidden transition-transform ${isHomeChatCollapsed ? '' : 'rotate-180'}`} />
+                  <div className={`w-6 h-6 rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm flex-shrink-0 ${isHomeChatCollapsed ? 'bg-transparent text-white shadow-none' : 'bg-[color:var(--primary)] text-white'}`}>
+                    <Zap size={14} />
+                  </div>
+                  <span className={`flex-1 text-left ${isHomeChatCollapsed ? 'hidden lg:block' : 'block'}`}>首页 AI 助手</span>
+                  <ChevronDown size={16} className={`lg:hidden transition-transform ${isHomeChatCollapsed ? 'hidden' : 'rotate-180'}`} />
                 </button>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setHomeMessages([{ role: 'ai', text: '你好，我是首页 AI 助手。想先看探探 / 睿睿 / 巡检哪个？' }])}
-                    className="ui-btn ui-btn-ghost h-8 px-3 text-xs"
-                  >
-                    清空
-                  </button>
-                </div>
               </div>
 
               <div className={`flex-1 overflow-y-auto no-scrollbar p-4 lg:p-6 space-y-4 bg-transparent ${isHomeChatCollapsed ? 'hidden lg:block' : ''}`}>
                 {homeMessages.map((m, idx) => (
-                  <div key={idx} className={`flex ${m.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
-                    <div className={`max-w-[90%] p-3 lg:p-4 rounded-2xl text-xs lg:text-sm leading-relaxed border shadow-[var(--shadow-sm)] ${m.role === 'ai' ? 'bg-[color:var(--surface)]/80 border-[color:var(--border)] text-[color:var(--text)] backdrop-blur-md' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
-                      {m.text}
+                  <div key={idx} className="flex flex-col gap-2">
+                    <div className={`flex ${m.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
+                      <div className={`max-w-[90%] p-3 lg:p-4 rounded-[var(--radius-xl)] text-xs lg:text-sm leading-relaxed border shadow-[var(--shadow-sm)] ${m.role === 'ai' ? 'bg-[color:var(--surface)]/80 border-[color:var(--border)] text-[color:var(--text)] backdrop-blur-md' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
+                        {m.text}
+                      </div>
                     </div>
+                    {idx === 0 && m.role === 'ai' && (
+                      <div className="flex flex-wrap gap-2 ml-1">
+                        <button onClick={() => setHomeInput('探探')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-3 lg:px-4 text-[10px] lg:text-xs rounded-full border-[color:var(--border)] bg-[color:var(--bg-surface-1)] hover:bg-[color:var(--bg-surface-2)] shadow-sm transition-all">探探</button>
+                        <button onClick={() => setHomeInput('睿睿')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-3 lg:px-4 text-[10px] lg:text-xs rounded-full border-[color:var(--border)] bg-[color:var(--bg-surface-1)] hover:bg-[color:var(--bg-surface-2)] shadow-sm transition-all">睿睿</button>
+                        <button onClick={() => setHomeInput('巡检')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-3 lg:px-4 text-[10px] lg:text-xs rounded-full border-[color:var(--border)] bg-[color:var(--bg-surface-1)] hover:bg-[color:var(--bg-surface-2)] shadow-sm transition-all">巡检</button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
 
-              <div className={`p-4 lg:p-6 border-t border-[color:var(--border)] bg-transparent ${isHomeChatCollapsed ? 'hidden lg:block' : ''}`}>
-                <div className="flex flex-wrap gap-2 mb-3 lg:mb-4">
-                  <button onClick={() => setHomeInput('探探')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-2 lg:px-3 text-[10px] lg:text-xs rounded-full">探探</button>
-                  <button onClick={() => setHomeInput('睿睿')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-2 lg:px-3 text-[10px] lg:text-xs rounded-full">睿睿</button>
-                  <button onClick={() => setHomeInput('巡检')} className="ui-btn ui-btn-secondary h-7 lg:h-8 px-2 lg:px-3 text-[10px] lg:text-xs rounded-full">巡检</button>
-                </div>
-                <div className="relative">
+              <div className={`p-3 lg:p-6 border-t border-[color:var(--border)] bg-transparent flex-shrink-0 ${isHomeChatCollapsed ? 'hidden lg:block' : ''}`}>
+                <div className="relative w-full flex flex-col lg:block gap-2 lg:gap-0">
                   <input
                     value={homeInput}
                     onChange={(e) => setHomeInput(e.target.value)}
@@ -408,14 +496,16 @@ const App: React.FC = () => {
                       if (e.key === 'Enter') sendHomeMessage();
                     }}
                     placeholder="输入你的问题…"
-                    className="ui-input pr-10 lg:pr-12 h-10 lg:h-11 text-xs lg:text-sm"
+                    className="ui-input w-full pl-4 pr-4 lg:pr-12 h-10 lg:h-11 text-xs lg:text-sm rounded-full bg-[color:var(--bg-surface-2)] border-transparent focus:bg-[color:var(--bg-surface-1)] focus:border-[color:var(--primary)] transition-all shadow-inner"
                   />
-                  <button
-                    onClick={sendHomeMessage}
-                    className="absolute right-1.5 lg:right-2 top-1.5 lg:top-2 bottom-1.5 lg:bottom-2 w-8 flex items-center justify-center text-[color:var(--primary)] hover:bg-[color:var(--primary-subtle)] rounded-[var(--radius-sm)] transition-colors"
-                  >
-                    <IconSend />
-                  </button>
+                  <div className="flex justify-end lg:block">
+                    <button
+                      onClick={sendHomeMessage}
+                      className="static lg:absolute lg:right-1 lg:top-1/2 lg:-translate-y-1/2 w-8 h-8 flex items-center justify-center bg-[color:var(--primary)] text-white rounded-full shadow-sm hover:shadow-md hover:scale-105 active:scale-95 transition-all"
+                    >
+                      <Send size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -428,4 +518,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default memo(App);

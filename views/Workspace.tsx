@@ -15,25 +15,25 @@ import {
 } from '../services/larkBaseService';
 import { analyzeImageForViolation, formatConfidence } from '../services/aiVisionService';
 import ViolationCard from '../components/ViolationCard';
+import { 
+  Hash, 
+  Type, 
+  List, 
+  Image, 
+  Zap, 
+  FileText, 
+  ArrowUpRight, 
+  MessageSquare, 
+  Send, 
+  Grid, 
+  ChevronDown 
+} from 'lucide-react';
 
 type AppId = 'home' | 'demo' | 'efficiency';
 type ViewId = 'main' | 'management' | 'equipment' | 'factory';
 type SecondaryViewId = Exclude<ViewId, 'main'>;
 type FieldType = 'text' | 'number' | 'select' | 'image';
 type BaseViewMode = 'table' | 'app';
-
-// Icons
-const IconHash = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>;
-const IconType = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>;
-const IconList = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>;
-const IconImage = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>;
-const IconZap = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>;
-const IconFileText = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
-const IconArrowUpRight = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>;
-const IconMessage = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>;
-const IconSend = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>;
-const IconGrid = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
-const IconChevronDown = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>;
 
 interface WorkspaceProps {
   demo: Demo;
@@ -51,6 +51,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
   const [isAiRunning, setIsAiRunning] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
   const [expandedStages, setExpandedStages] = useState<Record<string, boolean>>({});
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
   const baseIframeUrl = 'https://bytedance.larkoffice.com/base/Rcbrbk2qCazsPTs48TecJSIKnod?from=from_copylink';
   const baseAppIframeUrl = 'https://bytedance.larkoffice.com/app/Vv6DbpDoGawcMwszp3XcMms6nTf';
@@ -515,10 +516,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
 
   const getHeaderIcon = (type: FieldType) => {
     switch(type) {
-      case 'number': return <span className="text-[color:var(--primary)] mr-2"><IconHash /></span>;
-      case 'select': return <span className="text-[color:var(--warning)] mr-2"><IconList /></span>;
-      case 'image': return <span className="text-[color:var(--purple)] mr-2"><IconImage /></span>;
-      default: return <span className="text-[color:var(--text-3)] mr-2"><IconType /></span>;
+      case 'number': return <span className="text-[color:var(--primary)] mr-2"><Hash size={14} /></span>;
+      case 'select': return <span className="text-[color:var(--warning)] mr-2"><List size={14} /></span>;
+      case 'image': return <span className="text-[color:var(--purple)] mr-2"><Image size={14} /></span>;
+      default: return <span className="text-[color:var(--text-3)] mr-2"><Type size={14} /></span>;
     }
   };
 
@@ -619,8 +620,16 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
 
   return (
     <div className="h-full w-full flex flex-col lg:flex-row overflow-hidden bg-[color:var(--bg-body)] font-sans relative text-[color:var(--text)]">
+      {/* Sidebar Toggle Button */}
+      <button
+        onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+        className={`fixed top-20 right-4 z-[100] lg:hidden w-10 h-10 rounded-full bg-[color:var(--primary)] text-white shadow-lg flex items-center justify-center hover:bg-[color:var(--primary-hover)] transition-all ${isSidebarVisible ? 'hidden' : ''}`}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+      </button>
+
       <section className="flex-1 flex flex-col min-w-0 bg-[color:var(--bg-body)] relative overflow-hidden order-1">
-        <div className="flex-1 flex flex-col overflow-hidden bg-[color:var(--bg-body)]">
+        <div className="flex-1 flex flex-col overflow-y-auto bg-[color:var(--bg-body)]">
           {currentApp === 'demo' ? (
             demo.id === 'gtm' ? (
               <div className="flex-1 bg-[color:var(--bg-body)] relative">
@@ -640,13 +649,13 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
                   <div className="ml-auto inline-flex rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--bg-surface-1)] p-1">
                     <button
                       onClick={() => setBaseViewMode('table')}
-                      className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${baseViewMode === 'table' ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] shadow-sm ring-1 ring-black/5' : 'text-[color:var(--text-3)] hover:text-[color:var(--text)]'}`}
+                      className={`px-3 sm:px-4 py-1.5 text-xs sm:text-xs font-semibold rounded-[var(--radius-sm)] transition-all min-h-[44px] ${baseViewMode === 'table' ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] shadow-sm ring-1 ring-black/5' : 'text-[color:var(--text-3)] hover:text-[color:var(--text)]'}`}
                     >
                       多维表格
                     </button>
                     <button
                       onClick={() => setBaseViewMode('app')}
-                      className={`px-4 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${baseViewMode === 'app' ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] shadow-sm ring-1 ring-black/5' : 'text-[color:var(--text-3)] hover:text-[color:var(--text)]'}`}
+                      className={`px-3 sm:px-4 py-1.5 text-xs sm:text-xs font-semibold rounded-[var(--radius-sm)] transition-all min-h-[44px] ${baseViewMode === 'app' ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)] shadow-sm ring-1 ring-black/5' : 'text-[color:var(--text-3)] hover:text-[color:var(--text)]'}`}
                     >
                       应用模式
                     </button>
@@ -683,7 +692,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
           ) : (
             <div className="flex-1 flex items-center justify-center text-[color:var(--text-3)] flex-col gap-4">
               <div className="text-6xl opacity-10 grayscale">
-                <IconGrid />
+                <Grid size={60} strokeWidth={1} />
               </div>
               <p className="text-[10px] font-bold uppercase tracking-widest">Building AI Modules...</p>
             </div>
@@ -691,19 +700,227 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
         </div>
       </section>
 
-      {/* 3. AILY SIDEBAR */}
-      <aside className="w-full lg:w-[360px] h-[35vh] lg:h-auto border-t lg:border-t-0 lg:border-l border-[color:var(--border)] bg-[color:var(--bg-surface-1)] flex flex-col flex-shrink-0 z-50 shadow-xl relative order-2">
+      {/* Mobile Dialog Overlay */}
+      {isSidebarVisible && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[100] lg:hidden flex items-center justify-center p-4"
+          onClick={() => setIsSidebarVisible(false)}
+        >
+          <div 
+            className="w-full max-w-md max-h-[80vh] bg-[color:var(--bg-surface-1)] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Dialog Content */}
+            {demo.id === 'gtm' ? (
+              <>
+                <div className="h-14 border-b border-[color:var(--border)] flex items-center justify-between px-6 bg-[color:var(--bg-surface-1)] flex-shrink-0">
+                  <h4 className="text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest flex items-center gap-2">
+                    <div className="w-6 h-6 bg-[color:var(--primary)] rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm text-white">
+                      <Zap size={14} />
+                    </div>
+                    AILY 分析工作台
+                  </h4>
+                  <button 
+                    onClick={() => setIsSidebarVisible(false)}
+                    className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-[color:var(--bg-surface-2)] flex items-center justify-center text-[color:var(--text-3)] hover:text-[color:var(--text)] active:scale-95 transition-all"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 sm:space-y-4 bg-[color:var(--bg-surface-1)]">
+                  {(() => {
+                    const groupedSteps = demo.steps.reduce((acc, step) => {
+                      const stage = step.title.split(' - ')[0];
+                      if (!acc[stage]) {
+                        acc[stage] = [];
+                      }
+                      acc[stage].push(step);
+                      return acc;
+                    }, {} as Record<string, typeof demo.steps>);
+
+                    return Object.entries(groupedSteps).map(([stage, steps]) => {
+                      const typedSteps = steps as typeof demo.steps;
+                      const isExpanded = expandedStages[stage] !== false;
+                      return (
+                        <div key={stage} className="mb-2">
+                          <div 
+                            className="flex items-center justify-between py-3 cursor-pointer hover:bg-[color:var(--bg-surface-2)] rounded-lg px-2 -mx-2 select-none min-h-[44px]"
+                            onClick={() => setExpandedStages(prev => ({ ...prev, [stage]: !isExpanded }))}
+                          >
+                            <h5 className="text-xs sm:text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest">{stage}</h5>
+                            <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''} text-[color:var(--text-3)]`}>
+                              <ChevronDown size={16} />
+                            </div>
+                          </div>
+                          
+                          <div className={`space-y-3 sm:space-y-4 overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[1000px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                            {typedSteps.map((step) => {
+                              const tool = EFFICIENCY_TOOLS.find(t => t.name === step.component);
+                              return (
+                                <div 
+                                  key={step.id} 
+                                  className="p-3 sm:p-4 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-surface-2)] hover:border-[color:var(--primary)] transition-all cursor-pointer group flex gap-3"
+                                  onClick={() => tool?.url && window.open(tool.url, '_blank')}
+                                >
+                                  <div className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center overflow-hidden flex-shrink-0">
+                                    {tool?.avatarUrl ? (
+                                      <img src={tool.avatarUrl} alt={tool?.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                      <Zap size={20} />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <span className="text-sm font-bold text-[color:var(--text)]">{step.component}</span>
+                                    </div>
+                                    <p className="text-xs text-[color:var(--text-3)] line-clamp-2 group-hover:text-[color:var(--text-2)] transition-colors">{step.script}</p>
+                                  </div>
+                                  {tool?.url && (
+                                    <div className="flex items-center justify-center text-[color:var(--text-3)] group-hover:text-[color:var(--primary)] min-w-[44px] min-h-[44px]">
+                                      <ArrowUpRight size={16} />
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="h-14 border-b border-[color:var(--border)] flex items-center justify-between px-6 bg-[color:var(--bg-surface-1)] flex-shrink-0">
+                  <div className="flex flex-col min-w-0">
+                    <h4 className="text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest flex items-center gap-2">
+                      <div className="w-6 h-6 bg-[color:var(--primary)] rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm text-white">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+                      </div>
+                      AILY 分析工作台
+                    </h4>
+                    {activeBusinessContext && (
+                      <div className="text-[10px] font-semibold text-[color:var(--text-3)] tracking-tight truncate mt-1">
+                        当前上下文：{activeBusinessContext.title}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setMessages([])} className="text-xs font-medium text-[color:var(--text-3)] hover:text-[color:var(--text)] px-3 py-2 min-h-[44px] min-w-[44px] rounded-[var(--radius-sm)] hover:bg-[color:var(--bg-surface-2)] transition-colors">清空</button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsSidebarVisible(false);
+                      }}
+                      className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-[color:var(--bg-surface-2)] flex items-center justify-center text-[color:var(--text-3)] hover:text-[color:var(--text)] active:scale-95 transition-all"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  {/* Inspection Control Panel */}
+                  <div className="px-6 py-4 bg-[color:var(--bg-surface-2)] border-b border-[color:var(--border)] space-y-3">
+                    <div>
+                      <label className="text-xs font-semibold text-[color:var(--text-3)] mb-1.5 block">选择巡检点位</label>
+                      <div className="relative">
+                        <select 
+                          value={selectedCheckpoint}
+                          onChange={(e) => setSelectedCheckpoint(e.target.value)}
+                          disabled={isAnalyzing}
+                          className="w-full h-11 pl-3 pr-8 text-sm bg-[color:var(--bg-surface-1)] border border-[color:var(--border)] rounded-[var(--radius-md)] appearance-none focus:outline-none focus:ring-2 focus:ring-[color:var(--primary)]/20 focus:border-[color:var(--primary)] transition-all text-[color:var(--text-3)]"
+                        >
+                          {checkpointList.map(cp => (
+                            <option key={cp} value={cp}>{cp}</option>
+                          ))}
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--text-3)] pointer-events-none">
+                          <ChevronDown size={16} />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={executeInspectionAnalysis}
+                      disabled={isAnalyzing || !selectedCheckpoint}
+                      className={`w-full h-11 min-h-[44px] flex items-center justify-center gap-2 text-sm font-medium rounded-[var(--radius-md)] transition-all ${
+                        isAnalyzing || !selectedCheckpoint
+                          ? 'bg-[color:var(--bg-surface-2)] text-[color:var(--text-3)] cursor-not-allowed'
+                          : 'bg-[color:var(--primary)] text-white hover:bg-[color:var(--primary-hover)] shadow-lg shadow-[color:var(--primary)]/20'
+                      }`}
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>{analysisStep}</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                          开始AI巡检分析
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Chat Messages */}
+                  <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-[color:var(--bg-surface-1)]">
+                    {messages.length === 0 && (
+                      <div className="text-center py-8">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[color:var(--bg-surface-2)] flex items-center justify-center">
+                          <svg className="w-8 h-8 text-[color:var(--text-3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        </div>
+                        <p className="text-sm text-[color:var(--text-3)]">选择巡检点位后，点击"开始AI巡检分析"</p>
+                      </div>
+                    )}
+                    {messages.map((msg, idx) => (
+                      <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        {msg.role === 'ai' && (
+                          <div className="w-8 h-8 rounded-full bg-[color:var(--primary)] flex items-center justify-center text-white flex-shrink-0 mr-3">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+                          </div>
+                        )}
+                        <div className={`max-w-[85%] rounded-[var(--radius-xl)] px-4 py-3 ${msg.role === 'user' ? 'bg-[color:var(--primary)] text-white' : 'bg-[color:var(--bg-surface-2)] text-[color:var(--text)]'}`}>
+                          {msg.card && msg.card.type === 'violation' ? (
+                            <ViolationCard 
+                              {...msg.card.data} 
+                              onViewDetails={() => setBaseViewMode('table')}
+                            />
+                          ) : (
+                            <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    <div ref={chatEndRef} />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 3. AILY SIDEBAR - Desktop Only */}
+      <aside className={`${isSidebarVisible ? 'fixed inset-0 z-50 flex w-full h-full' : 'hidden'} lg:flex lg:static lg:w-[360px] lg:h-auto border-l border-[color:var(--border)] bg-[color:var(--bg-surface-1)] flex-col flex-shrink-0 shadow-xl relative order-2`}>
         {demo.id === 'gtm' ? (
           <div className="flex flex-col h-full">
-            <div className="h-14 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-6 bg-[color:var(--bg-surface-1)] sticky top-0 z-10">
-              <h4 className="text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest flex items-center gap-2">
+            <div className="h-14 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 sm:px-6 bg-[color:var(--bg-surface-1)] sticky top-0 z-10">
+              <h4 className="text-xs sm:text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest flex items-center gap-2">
                 <div className="w-6 h-6 bg-[color:var(--primary)] rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm text-white">
-                  <IconGrid />
+                  <Grid size={14} />
                 </div>
                 Agent 工具栈
               </h4>
+              <button 
+                onClick={() => setIsSidebarVisible(false)}
+                className="lg:hidden w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-[color:var(--bg-surface-2)] flex items-center justify-center text-[color:var(--text-3)] hover:text-[color:var(--text)] active:scale-95 transition-all"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[color:var(--bg-surface-1)]">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 sm:space-y-4 bg-[color:var(--bg-surface-1)]">
               {(() => {
                 const groupedSteps = demo.steps.reduce((acc, step) => {
                   const stage = step.title.split(' - ')[0];
@@ -720,40 +937,40 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
                   return (
                     <div key={stage} className="mb-2">
                       <div 
-                        className="flex items-center justify-between py-2 cursor-pointer hover:bg-[color:var(--bg-surface-2)] rounded-lg px-2 -mx-2 select-none"
+                        className="flex items-center justify-between py-3 cursor-pointer hover:bg-[color:var(--bg-surface-2)] rounded-lg px-2 -mx-2 select-none min-h-[44px]"
                         onClick={() => setExpandedStages(prev => ({ ...prev, [stage]: !isExpanded }))}
                       >
-                        <h5 className="text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest">{stage}</h5>
+                        <h5 className="text-xs sm:text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest">{stage}</h5>
                         <div className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''} text-[color:var(--text-3)]`}>
-                          <IconChevronDown />
+                          <ChevronDown size={16} />
                         </div>
                       </div>
                       
-                      <div className={`space-y-4 overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[1000px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                      <div className={`space-y-3 sm:space-y-4 overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[1000px] opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
                         {typedSteps.map((step) => {
                           const tool = EFFICIENCY_TOOLS.find(t => t.name === step.component);
                           return (
                             <div 
                               key={step.id} 
-                              className="p-4 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-surface-2)] hover:border-[color:var(--primary)] transition-all cursor-pointer group flex gap-3"
+                              className="p-3 sm:p-4 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-surface-2)] hover:border-[color:var(--primary)] transition-all cursor-pointer group flex gap-3"
                               onClick={() => tool?.url && window.open(tool.url, '_blank')}
                             >
-                              <div className="w-10 h-10 rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center overflow-hidden flex-shrink-0">
+                              <div className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center overflow-hidden flex-shrink-0">
                                 {tool?.avatarUrl ? (
                                   <img src={tool.avatarUrl} alt={tool?.name} className="w-full h-full object-cover" />
                                 ) : (
-                                  <IconZap />
+                                  <Zap size={20} />
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className="text-sm font-bold text-[color:var(--text)]">{step.component}</span>
+                                  <span className="text-sm sm:text-sm font-bold text-[color:var(--text)]">{step.component}</span>
                                 </div>
-                                <p className="text-xs text-[color:var(--text-3)] line-clamp-2 group-hover:text-[color:var(--text-2)] transition-colors">{step.script}</p>
+                                <p className="text-xs sm:text-xs text-[color:var(--text-3)] line-clamp-2 group-hover:text-[color:var(--text-2)] transition-colors">{step.script}</p>
                               </div>
                               {tool?.url && (
-                                <div className="flex items-center justify-center text-[color:var(--text-3)] group-hover:text-[color:var(--primary)]">
-                                  <IconArrowUpRight />
+                                <div className="flex items-center justify-center text-[color:var(--text-3)] group-hover:text-[color:var(--primary)] min-w-[44px] min-h-[44px]">
+                                  <ArrowUpRight size={16} />
                                 </div>
                               )}
                             </div>
@@ -768,40 +985,48 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
           </div>
         ) : (
           <>
-            <div className="h-14 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-6 bg-[color:var(--bg-surface-1)] sticky top-0 z-10">
+            <div className="h-14 lg:h-16 border-b border-[color:var(--border)] flex items-center justify-between px-4 sm:px-6 bg-[color:var(--bg-surface-1)] sticky top-0 z-10">
               <div className="flex flex-col min-w-0">
-                <h4 className="text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest flex items-center gap-2">
+                <h4 className="text-xs sm:text-xs font-bold text-[color:var(--text-2)] uppercase tracking-widest flex items-center gap-2">
                   <div className="w-6 h-6 bg-[color:var(--primary)] rounded-[var(--radius-sm)] flex items-center justify-center shadow-sm text-white">
                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
                   </div>
                   Aily 分析工作台
                 </h4>
                 {activeBusinessContext && (
-                  <div className="text-[10px] font-semibold text-[color:var(--text-3)] tracking-tight truncate mt-1">
+                  <div className="text-[10px] sm:text-[10px] font-semibold text-[color:var(--text-3)] tracking-tight truncate mt-1">
                     当前上下文：{activeBusinessContext.title}
                   </div>
                 )}
               </div>
-              <button onClick={() => setMessages([])} className="text-xs font-medium text-[color:var(--text-3)] hover:text-[color:var(--text)] px-2 py-1 rounded hover:bg-[color:var(--bg-surface-2)] transition-colors">清空</button>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setMessages([])} className="text-xs sm:text-xs font-medium text-[color:var(--text-3)] hover:text-[color:var(--text)] px-3 py-2 min-h-[44px] min-w-[44px] rounded-[var(--radius-sm)] hover:bg-[color:var(--bg-surface-2)] transition-colors">清空</button>
+                <button 
+                  onClick={() => setIsSidebarVisible(false)}
+                  className="lg:hidden w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-[color:var(--bg-surface-2)] flex items-center justify-center text-[color:var(--text-3)] hover:text-[color:var(--text)] active:scale-95 transition-all"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
             </div>
 
             {/* Inspection Control Panel */}
-            <div className="px-6 py-4 bg-[color:var(--bg-surface-2)] border-b border-[color:var(--border)] space-y-3">
+            <div className="px-4 sm:px-6 py-4 bg-[color:var(--bg-surface-2)] border-b border-[color:var(--border)] space-y-3">
               <div>
-                <label className="text-xs font-semibold text-[color:var(--text-3)] mb-1.5 block">选择巡检点位</label>
+                <label className="text-xs sm:text-xs font-semibold text-[color:var(--text-3)] mb-1.5 block">选择巡检点位</label>
                 <div className="relative">
                   <select 
                     value={selectedCheckpoint}
                     onChange={(e) => setSelectedCheckpoint(e.target.value)}
                     disabled={isAnalyzing}
-                    className="w-full h-9 pl-3 pr-8 text-sm bg-[color:var(--bg-surface-1)] border border-[color:var(--border)] rounded-[var(--radius-md)] appearance-none focus:outline-none focus:ring-2 focus:ring-[color:var(--primary)]/20 focus:border-[color:var(--primary)] transition-all text-[color:var(--text-3)]"
+                    className="w-full h-11 pl-3 pr-8 text-sm bg-[color:var(--bg-surface-1)] border border-[color:var(--border)] rounded-[var(--radius-md)] appearance-none focus:outline-none focus:ring-2 focus:ring-[color:var(--primary)]/20 focus:border-[color:var(--primary)] transition-all text-[color:var(--text-3)]"
                   >
                     {checkpointList.map(cp => (
                       <option key={cp} value={cp}>{cp}</option>
                     ))}
                   </select>
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--text-3)] pointer-events-none">
-                    <IconChevronDown />
+                    <ChevronDown size={16} />
                   </div>
                 </div>
               </div>
@@ -809,10 +1034,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
               <button
                 onClick={executeInspectionAnalysis}
                 disabled={isAnalyzing || !selectedCheckpoint}
-                className={`w-full h-9 flex items-center justify-center gap-2 text-sm font-medium rounded-[var(--radius-md)] transition-all ${
+                className={`w-full h-11 min-h-[44px] flex items-center justify-center gap-2 text-sm font-medium rounded-[var(--radius-md)] transition-all ${
                   isAnalyzing || !selectedCheckpoint
                     ? 'bg-[color:var(--bg-surface-3)] text-[color:var(--text-3)] cursor-not-allowed'
-                    : 'bg-[color:var(--primary)] text-white hover:bg-[color:var(--primary-hover)] shadow-sm hover:shadow'
+                    : 'bg-[color:var(--primary)] text-white hover:bg-[color:var(--primary-hover)] shadow-sm hover:shadow active:scale-95'
                 }`}
               >
                 {isAnalyzing ? (
@@ -822,17 +1047,17 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
                   </>
                 ) : (
                   <>
-                    <IconZap />
+                    <Zap size={16} />
                     <span>执行智能巡检</span>
                   </>
                 )}
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-5 no-scrollbar bg-[color:var(--bg-surface-1)]">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 no-scrollbar bg-[color:var(--bg-surface-1)]">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'} animate-fadeIn`}>
-                  <div className={`max-w-[90%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm border ${msg.role === 'ai' ? 'bg-[color:var(--bg-surface-2)] border-[color:var(--border)] text-[color:var(--text)]' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
+                  <div className={`max-w-[90%] sm:max-w-[90%] p-3 sm:p-4 rounded-2xl text-sm leading-relaxed shadow-sm border ${msg.role === 'ai' ? 'bg-[color:var(--bg-surface-2)] border-[color:var(--border)] text-[color:var(--text)]' : 'bg-[color:var(--primary)] border-transparent text-white'}`}>
                     {msg.text && <div className="whitespace-pre-wrap">{msg.text}</div>}
                     {msg.card && msg.card.type === 'violation' && (
                       <ViolationCard 
@@ -845,13 +1070,13 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
               ))}
               {isAilyThinking && (
                 <div className="flex justify-start animate-pulse">
-                  <div className="bg-[color:var(--bg-surface-2)] p-3 rounded-[var(--radius-md)] text-xs text-[color:var(--text-3)] font-semibold border border-[color:var(--border)] shadow-sm">Aily 正在深度解构业务维度...</div>
+                  <div className="bg-[color:var(--bg-surface-2)] p-3 sm:p-4 rounded-[var(--radius-md)] text-xs text-[color:var(--text-3)] font-semibold border border-[color:var(--border)] shadow-sm">Aily 正在深度解构业务维度...</div>
                 </div>
               )}
               <div ref={chatEndRef} />
             </div>
 
-            <div className="p-6 border-t border-[color:var(--border)] bg-[color:var(--bg-surface-1)]">
+            <div className="p-4 sm:p-6 border-t border-[color:var(--border)] bg-[color:var(--bg-surface-1)]">
               <div className="relative">
                 <input
                   type="text"
@@ -869,8 +1094,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
                     }
                   }}
                 />
-                <button className="absolute right-2 top-2 bottom-2 w-8 flex items-center justify-center text-[color:var(--text:var(--text-3)] hover:text-[color:var(--text)] hover:bg-[color:var(--bg-surface-3)] rounded-[var(--radius-sm)] transition-all" disabled={isAilyThinking}>
-                  <IconSend />
+                <button className="absolute right-2 top-2 bottom-2 w-10 h-10 min-w-[44px] min-h-[44px] flex items-center justify-center text-[color:var(--text-3)] hover:text-[color:var(--text)] hover:bg-[color:var(--bg-surface-3)] rounded-[var(--radius-sm)] transition-all active:scale-95" disabled={isAilyThinking}>
+                  <Send size={18} />
                 </button>
               </div>
             </div>

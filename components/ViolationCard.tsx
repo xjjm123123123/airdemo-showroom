@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle, MapPin, Clock, ShieldAlert } from 'lucide-react';
 
 interface ViolationCardProps {
   imageUrl: string;
@@ -95,13 +96,11 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
   const violationDetails = getViolationDetails(violationType);
   
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 my-3 animate-fadeIn">
+    <div className="bg-white rounded-[var(--radius-lg)] overflow-hidden shadow-sm border border-gray-200 my-3 animate-fadeIn">
       {/* 头部 - 蓝色背景 */}
       <div className="bg-[#E8F3FF] px-4 py-3 border-b border-[#D0E7FF]">
         <div className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-[#3370FF]" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
+          <ShieldAlert className="w-5 h-5 text-[#3370FF]" />
           <span className="text-[#3370FF] font-semibold text-sm">AI 巡检违规识别</span>
         </div>
       </div>
@@ -118,9 +117,10 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
       {/* 内容区域 */}
       <div className="p-4 space-y-3">
         {/* 违规情况卡片 - 蓝色背景 */}
-        <div className="bg-[#E8F3FF] rounded-lg p-3 border border-[#D0E7FF]">
+        <div className="bg-[#E8F3FF] rounded-[var(--radius-md)] p-3 border border-[#D0E7FF]">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[#3370FF] font-semibold text-xs">🚨 {violationType}</span>
+            <AlertTriangle size={14} className="text-[#3370FF]" />
+            <span className="text-[#3370FF] font-semibold text-xs">{violationType}</span>
           </div>
           <div className="text-xs text-gray-700 leading-relaxed space-y-1">
             {violationDetails.map((detail, index) => (
@@ -130,9 +130,10 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
         </div>
 
         {/* 位置信息卡片 - 浅蓝色背景 */}
-        <div className="bg-[#F0F8FF] rounded-lg p-3 border border-[#D9ECFF]">
+        <div className="bg-[#F0F8FF] rounded-[var(--radius-md)] p-3 border border-[#D9ECFF]">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[#5B8FF9] font-semibold text-xs">📍 位置信息</span>
+            <MapPin size={14} className="text-[#5B8FF9]" />
+            <span className="text-[#5B8FF9] font-semibold text-xs">位置信息</span>
           </div>
           <div className="text-xs text-gray-700 leading-relaxed space-y-1">
             <div>• 点位：{location}</div>
@@ -142,9 +143,10 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
         </div>
 
         {/* 时间信息卡片 - 青色背景 */}
-        <div className="bg-[#E6F7FF] rounded-lg p-3 border border-[#BAE7FF]">
+        <div className="bg-[#E6F7FF] rounded-[var(--radius-md)] p-3 border border-[#BAE7FF]">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-[#1890FF] font-semibold text-xs">⏰ 时间信息</span>
+            <Clock size={14} className="text-[#1890FF]" />
+            <span className="text-[#1890FF] font-semibold text-xs">时间信息</span>
           </div>
           <div className="text-xs text-gray-700 leading-relaxed space-y-1">
             <div>• 日期：{date}</div>
@@ -156,7 +158,7 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
         {/* 操作按钮 - 蓝色填充 */}
         <button 
           onClick={onViewDetails}
-          className="w-full bg-[#3370FF] hover:bg-[#2B5DD1] text-white py-2.5 rounded-lg text-xs font-medium transition-all shadow-sm"
+          className="w-full bg-[#3370FF] hover:bg-[#2B5DD1] text-white py-2.5 rounded-[var(--radius-md)] text-xs font-medium transition-all shadow-sm"
         >
           立即查看详情
         </button>
