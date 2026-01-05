@@ -36,6 +36,7 @@ type Message = {
 };
 
 const AI_NAVIGATOR_URL = 'https://www.ailinghangzhe.cn';
+const AILY_CHAT_ENDPOINT = (import.meta as any).env?.VITE_AILY_CHAT_ENDPOINT || '/api/aily';
 
 const App: React.FC = () => {
   const [selectedDemo, setSelectedDemo] = useState<Demo | null>(null);
@@ -46,6 +47,7 @@ const App: React.FC = () => {
   const [homeInput, setHomeInput] = useState('');
   const [isHomeChatCollapsed, setIsHomeChatCollapsed] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isHomeChatLoading, setIsHomeChatLoading] = useState(false);
 
   const handleGoHome = () => {
     setSelectedDemo(null);
@@ -64,22 +66,52 @@ const App: React.FC = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const replyHomeAssistant = (text: string) => {
+  const replyHomeAssistantFallback = (text: string) => {
     const t = text.trim();
     const lower = t.toLowerCase();
-    if (!t) return '';
+    if (!t) return '我这边没听清，可以再具体一点吗？';
     if (t.includes('探探') || lower.includes('tantan')) return '探探适合做互动式客户调研，自动生成调研总结，先把关注点收敛。';
-    if (t.includes('睿睿') || lower.includes('ruirui')) return '睿睿适合做汇报复盘：金句、干系人洞察、故事线与案例推荐。';
-    if (t.includes('巡检') || t.includes('智能巡检') || lower.includes('inspection')) return '点击「AI 智能巡检」卡片即可进入演示。';
-    if (t.includes('推荐') || t.includes('怎么选')) return '给我 3 个信息：行业 / 角色 / 痛点，我给你推荐路径。';
-    return '收到。也可以直接点「最新 Demo / 最新数字伙伴」卡片快速进入。';
+    if (t.includes('睿睿') || lower.includes('ruirui')) return '睿睿适合做汇报复盘：金句、干系人洞察、故事线及案例推荐。';
+    if (t.includes('巡检') || t.includes('智能巡检') || lower.includes('inspection')) return '可以直接点击首页里的「AI 智能巡检」卡片进入演示，我会帮你讲完闭环。';
+    if (t.includes('推荐') || t.includes('怎么选')) return '你可以告诉我 行业 / 角色 / 当前最大痛点，我帮你选一条最合适的 Demo 路线。';
+    return '收到。如果你愿意，也可以直接从首页卡片进入「最新 Demo」或「最新数字伙伴」。';
   };
 
-  const sendHomeMessage = () => {
+  const sendHomeMessage = async () => {
     const text = homeInput.trim();
-    if (!text) return;
-    setHomeMessages((prev) => [...prev, { role: 'user', text }, { role: 'ai', text: replyHomeAssistant(text) }]);
+    if (!text || isHomeChatLoading) return;
+
+    // 先把用户消息 push 进去
+    setHomeMessages((prev) => [...prev, { role: 'user', text }]);
     setHomeInput('');
+    setIsHomeChatLoading(true);
+
+    try {
+      const resp = await fetch(AILY_CHAT_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: text }),
+      });
+
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      const answer = typeof data?.answer === 'string' && data.answer.trim()
+        ? data.answer.trim()
+        : replyHomeAssistantFallback(text);
+
+      setHomeMessages((prev) => [...prev, { role: 'ai', text: answer }]);
+    } catch (error) {
+      console.error('首页 Aily 对话调用失败，使用本地 fallback：', error);
+      const fallback = replyHomeAssistantFallback(text);
+      setHomeMessages((prev) => [...prev, { role: 'ai', text: fallback }]);
+    } finally {
+      setIsHomeChatLoading(false);
+    }
   };
 
   const activeLabel = selectedDemo 
