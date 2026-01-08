@@ -303,14 +303,5 @@ export const EFFICIENCY_TOOLS = [
     url: 'https://bytedance.larkoffice.com/share/base/form/shrcn5qfPJUyu3YJwTmWz0idEbf',
     skills: ['方案汇报自动化给出复盘建议'],
     highlight: '发见客户讲一半电脑没电了，扣了很多分'
-  },
-  {
-    id: 'xuzhi',
-    name: '许豸',
-    title: '会议任务督办系统',
-    avatarUrl: '',
-    url: 'https://bytedance.larkoffice.com/app/V3ODb8WGMazgV8skMzacVeKhnyd?pageId=pgespYNABKPJQ572',
-    skills: ['会议信息全生命周期管理', 'AI智能待办提取', '任务可视化派发', '多维度进度跟踪', '任务进度实时获取'],
-    highlight: '通过自动化和标准化流程，解决传统会议中任务落地难、跟进不及时、责任不明确等问题。'
   }
 ] as const;
