@@ -22,9 +22,11 @@ import { DEMO_LIST, EFFICIENCY_TOOLS, PROMPT_TEMPLATES, INSPECTION_COVER_URL, GT
 import Catalog from './views/Catalog';
 import Workspace from './views/Workspace';
 import DemoFlow from './views/DemoFlow';
+import AIGTMView from './views/AIGTMView';
 import Efficiency from './views/Efficiency';
 import Prism from './components/Prism';
 import TextType from './components/TextType';
+import BottomToolbar from './components/BottomToolbar';
 import { Demo } from './types';
 
 type AppId = 'home' | 'demo' | 'efficiency';
@@ -129,6 +131,25 @@ const App: React.FC = () => {
     { id: 'demo', name: 'Demo中心', icon: <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_31_10%201.png" alt="Demo" className="w-4 h-4 object-contain" loading="lazy" /> },
     { id: 'efficiency', name: '数字伙伴', icon: <img src="https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/ChatGPT%20Image%202025%E5%B9%B412%E6%9C%8825%E6%97%A5%2014_31_37%201.png" alt="数字伙伴" className="w-4 h-4 object-contain" loading="lazy" /> }
   ];
+
+  const handleToolbarNavigate = (id: string) => {
+    if (id === 'inspection') {
+      const demo = DEMO_LIST.find(d => d.id === 'inspection');
+      if (demo) {
+        setSelectedDemo(demo);
+        setCurrentApp('demo');
+        setDemoViewMode('flow');
+      }
+    } else if (id === 'tantan') {
+      // 映射到 GTM Demo (包含探探)
+      const demo = DEMO_LIST.find(d => d.id === 'gtm');
+      if (demo) {
+        setSelectedDemo(demo);
+        setCurrentApp('demo');
+        setDemoViewMode('flow');
+      }
+    }
+  };
 
   return (
     <div className="h-[100dvh] w-full bg-[color:var(--bg)] overflow-hidden font-sans relative">
@@ -289,6 +310,8 @@ const App: React.FC = () => {
         ) : selectedDemo ? (
           (demoViewMode === 'flow') ? (
             <DemoFlow demo={selectedDemo} onEnterApp={() => setDemoViewMode('workspace')} />
+          ) : selectedDemo.id === 'gtm' ? (
+            <AIGTMView />
           ) : (
             <Workspace demo={selectedDemo} currentApp={currentApp} initialView={workspaceInitialView} />
           )
@@ -475,6 +498,8 @@ const App: React.FC = () => {
                     </div>
                   </div>
                 </section>
+
+                <BottomToolbar onNavigate={handleToolbarNavigate} />
               </div>
             </div>
 
