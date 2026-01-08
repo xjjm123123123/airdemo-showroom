@@ -340,15 +340,38 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
            {/* Content */}
            <div className="flex-1 p-6 overflow-y-auto">
               <div className="aspect-video w-full rounded-xl bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] mb-6 overflow-hidden relative group">
-                 {demo.cover ? (
+                 {demo.id === 'inspection' ? (
+                   <video 
+                     src="/video/巡检demo演示.mp4" 
+                     className="w-full h-full object-cover"
+                     controls
+                     autoPlay
+                     muted
+                     loop
+                   />
+                 ) : demo.cover ? (
                    <img src={demo.cover} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                  ) : (
                    <div className="w-full h-full flex items-center justify-center text-[color:var(--text-3)]">Preview</div>
                  )}
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4">
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4 pointer-events-none">
                     <h2 className="text-white font-bold text-lg">{demo.title}</h2>
                  </div>
               </div>
+
+              {demo.id === 'inspection' && (
+                <div className="mb-6 text-center">
+                  <a 
+                    href="https://bytedance.larkoffice.com/docx/IGOIdvqKwoyr0txSiAOchpoSn7d?from=auth_notice&hash=f312b4dccca9ccfc1c61e8db0afc4dc3" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[color:var(--primary)] hover:underline text-sm flex items-center justify-center gap-1"
+                  >
+                    <span>查看说明文档</span>
+                    <ArrowRight size={14} />
+                  </a>
+                </div>
+              )}
 
               <div className="space-y-6">
                 <div>
