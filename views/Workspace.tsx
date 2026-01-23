@@ -60,15 +60,13 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
       setIframeError(false);
       
       const timeout = setTimeout(() => {
-        if (iframeLoading) {
-          setIframeError(true);
-          setIframeLoading(false);
-        }
+        setIframeError(true);
+        setIframeLoading(false);
       }, 5000);
 
       return () => clearTimeout(timeout);
     }
-  }, [demo.url, currentApp]);
+  }, [demo.url, currentApp, demo.id]);
 
   const baseIframeUrl = 'https://bytedance.larkoffice.com/base/Rcbrbk2qCazsPTs48TecJSIKnod?from=from_copylink';
   const baseAppIframeUrl = 'https://bytedance.larkoffice.com/app/Vv6DbpDoGawcMwszp3XcMms6nTf';

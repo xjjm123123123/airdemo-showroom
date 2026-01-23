@@ -311,7 +311,13 @@ const App: React.FC = () => {
           (demoViewMode === 'flow') ? (
             <DemoFlow 
               demo={selectedDemo} 
-              onEnterApp={() => setDemoViewMode('workspace')} 
+              onEnterApp={() => {
+                if (selectedDemo.url) {
+                  window.open(selectedDemo.url, '_blank', 'noopener,noreferrer');
+                } else {
+                  setDemoViewMode('workspace');
+                }
+              }} 
             />
           ) : selectedDemo.id === 'gtm' ? (
             <AIGTMView />
