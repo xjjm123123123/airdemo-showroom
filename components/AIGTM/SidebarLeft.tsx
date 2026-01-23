@@ -23,9 +23,16 @@ const SidebarLeft: React.FC = () => {
       {/* Content */}
       <div className="flex-1 px-3 overflow-y-auto pt-6 pb-28">
         <div className="mb-6 px-2">
-          <h3 className="text-[18px] font-semibold text-lark-textPrimary mb-1">
-            构建你的工作流
-          </h3>
+          <div className="flex items-center gap-2 mb-1">
+            <img 
+              src="https://lf3-static.bytednsdoc.com/obj/eden-cn/LMfspH/ljhwZthlaukjlkulzlp/newAilyLogo.png" 
+              alt="Aily" 
+              className="w-5 h-5 object-contain" 
+            />
+            <h3 className="text-[18px] font-semibold text-lark-textPrimary">
+              aily工作流
+            </h3>
+          </div>
           <p className="text-sm text-lark-textSecondary leading-relaxed">
             我可以帮你查找潜在客户、丰富数据或自动化调研。
           </p>

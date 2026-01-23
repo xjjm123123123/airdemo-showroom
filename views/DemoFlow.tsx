@@ -217,7 +217,7 @@ const DemoFlow: React.FC<DemoFlowProps> = ({ demo, onEnterApp }) => {
     const CARD_HEIGHT = 200;
     const GAP_X = 60;
     const GAP_Y = 80;
-    const PADDING = 300;
+    const PADDING = 60;
 
     const positionedNodes = rawNodes.map((node, index) => {
       const row = Math.floor(index / COLUMNS);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Zap } from 'lucide-react';
+import { Zap, FileText, PlayCircle } from 'lucide-react';
 import Prism from '../components/Prism';
 import { EFFICIENCY_TOOLS } from '../constants';
 
@@ -10,7 +10,7 @@ const ToolAvatar: React.FC<{ tool: EfficiencyTool }> = ({ tool }) => {
     return (
       <img
         src={tool.avatarUrl}
-        alt={tool.name}
+        alt={tool.name || tool.title}
         className="w-full h-full object-cover"
         loading="lazy"
         referrerPolicy="no-referrer"
@@ -53,7 +53,7 @@ const Efficiency: React.FC = () => {
                   <div className="min-w-0 flex-1 pt-0.5">
                     <div className="flex items-center gap-2 flex-wrap">
                        <h3 className="text-base sm:text-lg font-semibold text-[color:var(--text)] tracking-tight">{tool.title}</h3>
-                       <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[color:var(--bg-surface-2)] text-[color:var(--text-2)] border border-[color:var(--border)] uppercase tracking-wide">{tool.name}</span>
+                       {tool.name && <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[color:var(--bg-surface-2)] text-[color:var(--text-2)] border border-[color:var(--border)] uppercase tracking-wide">{tool.name}</span>}
                     </div>
                     <a href={tool.url} target="_blank" rel="noreferrer" className="text-xs font-normal text-[color:var(--text-3)] hover:text-[color:var(--primary)] truncate block mt-1 transition-colors max-w-full">
                       {tool.url}
@@ -66,33 +66,46 @@ const Efficiency: React.FC = () => {
                 "{tool.highlight}"
               </div>
 
-              <div className="flex items-center justify-between mt-auto pt-1 gap-3">
+              <div className="flex flex-col gap-3 mt-auto pt-1">
                  <div className="flex flex-wrap gap-2">
                   {tool.skills.slice(0, 2).map((s) => (
                     <span key={`${tool.id}-${s}`} className="px-2.5 py-1 rounded-full border border-[color:var(--border)] bg-[color:var(--bg-surface-1)] text-[11px] font-medium text-[color:var(--text-2)]">
                       {s}</span>
                   ))}
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <a
-                    href={tool.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="ui-btn ui-btn-primary !min-h-[36px] !h-9 !px-4 !text-xs sm:!text-sm rounded-full font-medium shadow-sm flex items-center justify-center transition-transform active:scale-95"
-                  >
-                    打开
-                  </a>
-                  <button
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(tool.url);
-                      } catch {
-                      }
-                    }}
-                    className="ui-btn ui-btn-secondary !min-h-[36px] !h-9 !px-4 !text-xs sm:!text-sm rounded-full font-medium shadow-sm flex items-center justify-center transition-transform active:scale-95"
-                  >
-                    复制
-                  </button>
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-[color:var(--border-subtle)]">
+                  <div className="flex gap-2">
+                    <a
+                      href={tool.docUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ui-btn ui-btn-secondary !min-h-[32px] !h-8 !px-3 !text-xs rounded-full font-medium shadow-sm flex items-center justify-center gap-1.5 transition-transform active:scale-95"
+                      title="查看说明文档"
+                    >
+                      <FileText size={14} />
+                      <span className="hidden sm:inline">文档</span>
+                    </a>
+                    <a
+                      href={tool.videoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ui-btn ui-btn-secondary !min-h-[32px] !h-8 !px-3 !text-xs rounded-full font-medium shadow-sm flex items-center justify-center gap-1.5 transition-transform active:scale-95"
+                      title="观看演示视频"
+                    >
+                      <PlayCircle size={14} />
+                      <span className="hidden sm:inline">视频</span>
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={tool.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ui-btn ui-btn-primary !min-h-[32px] !h-8 !px-4 !text-xs sm:!text-sm rounded-full font-medium shadow-sm flex items-center justify-center transition-transform active:scale-95"
+                    >
+                      打开
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

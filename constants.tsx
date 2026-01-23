@@ -250,6 +250,28 @@ export const DEMO_LIST: Demo[] = [
       actions: ['针对进行中任务下发自动化催办', '优化机械维修工的任务排班', '引入视觉 AI 深度分析电机震动数据'],
       next: '设备健康度周度例会'
     }
+  },
+  {
+    id: '3d-packing',
+    title: '智能3D装箱模拟器',
+    cover: 'https://files.imagetourl.net/uploads/1766245759016-b1a82b7e-adc4-438c-84b4-d4e95790c2d1.png',
+    valueProp: '基于AI算法的智能装箱方案，提高装载率，降低物流成本',
+    points: ['订单自动优化', '3D可视化装箱', '装载率实时计算'],
+    audience: '物流经理 / 仓储主管 / 供应链负责人',
+    url: 'https://boxes-loader.vercel.app/',
+    steps: [
+      { id: 1, title: '订单数据接入', component: 'Base 表格', script: '自动同步订单SKU、数量及尺寸信息', value: '数据标准化', fallback: '' },
+      { id: 2, title: '箱型智能匹配', component: 'Aily', script: '根据物品体积自动推荐最佳箱型', value: '减少包材浪费', fallback: '' },
+      { id: 3, title: '3D 装箱算法', component: '参参', script: '计算最优摆放位置，最大化空间利用率', value: '提高装载率', fallback: '' },
+      { id: 4, title: '可视化模拟', component: '呆呆', script: '生成3D装箱方案，指导现场作业', value: '直观易懂', fallback: '' }
+    ],
+    mainTable: [],
+    aiInsights: {
+      conclusion: '',
+      risks: [],
+      actions: [],
+      next: ''
+    }
   }
 ];
 
@@ -262,7 +284,9 @@ export const EFFICIENCY_TOOLS = [
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.37.png',
     url: 'https://ruirui.airdemo.cn/',
     skills: ['方案金句推荐', '客户干系人及业务研究洞察', '汇报故事线及案例推荐'],
-    highlight: '飞书助力顺丰打造AI世界中的顺丰速度'
+    highlight: '飞书助力顺丰打造AI世界中的顺丰速度',
+    docUrl: '#',
+    videoUrl: '#'
   },
   {
     id: 'tantan',
@@ -272,7 +296,9 @@ export const EFFICIENCY_TOOLS = [
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.43.png',
     url: 'https://tantan.airdemo.cn/',
     skills: ['互动式调研', '自动生成调研总结'],
-    highlight: '一位参会受访的老板这样说：前一天晚上AI就把我想要关注的事项了解了，第二天内容更高效了。AI带来的体验太直观了。'
+    highlight: '一位参会受访的老板这样说：前一天晚上AI就把我想要关注的事项了解了，第二天内容更高效了。AI带来的体验太直观了。',
+    docUrl: '#',
+    videoUrl: '#'
   },
   {
     id: 'daidai',
@@ -282,7 +308,9 @@ export const EFFICIENCY_TOOLS = [
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.58.png',
     url: 'https://aily.feishu.cn/agents/agent_4j12fz05we0z7',
     skills: ['一键生成demo所需定制化数据', '模拟客户真实知识库', '模拟飞阅会战略规划文档', 'base表中模拟业务数据', '搭建智能体所需提示词'],
-    highlight: '一次PoV汇报，节省了半天时间准备demo相关数据'
+    highlight: '一次PoV汇报，节省了半天时间准备demo相关数据',
+    docUrl: '#',
+    videoUrl: '#'
   },
   {
     id: 'tutu',
@@ -292,7 +320,9 @@ export const EFFICIENCY_TOOLS = [
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.58.png',
     url: 'https://bytedance.larkoffice.com/app/PwQtb3EjOa4nIOsgtnBcxeMQnud?chunked=false&pageId=pgepRQZvt4TG14Kb',
     skills: ['生成匹配飞书视觉风格的PPT配图'],
-    highlight: '认养一头牛董事长徐晓波在AI大讲堂中只拍了三页，但都是AI生成配图的PPT'
+    highlight: '认养一头牛董事长徐晓波在AI大讲堂中只拍了三页，但都是AI生成配图的PPT',
+    docUrl: '#',
+    videoUrl: '#'
   },
   {
     id: 'cancen',
@@ -302,6 +332,19 @@ export const EFFICIENCY_TOOLS = [
       'https://raw.githubusercontent.com/xjjm123123123/my_imge/main/img/%E6%88%AA%E5%B1%8F2025-12-24%20%E4%B8%8B%E5%8D%8810.07.37.png',
     url: 'https://bytedance.larkoffice.com/share/base/form/shrcn5qfPJUyu3YJwTmWz0idEbf',
     skills: ['方案汇报自动化给出复盘建议'],
-    highlight: '发见客户讲一半电脑没电了，扣了很多分'
+    highlight: '发见客户讲一半电脑没电了，扣了很多分',
+    docUrl: '#',
+    videoUrl: '#'
+  },
+  {
+    id: 'meeting-supervision',
+    name: '',
+    title: '会议任务督办系统',
+    avatarUrl: '',
+    url: 'https://bytedance.larkoffice.com/app/V3ODb8WGMazgV8skMzacVeKhnyd?pageId=pgespYNABKPJQ572',
+    skills: ['会议全生命周期管理', 'AI智能待办提取', '任务可视化派发', '多维度进度跟踪', '任务进度实时获取'],
+    highlight: '36 条日志',
+    docUrl: '#',
+    videoUrl: '#'
   }
 ] as const;

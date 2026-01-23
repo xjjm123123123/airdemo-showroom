@@ -631,7 +631,23 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
       <section className="flex-1 flex flex-col min-w-0 bg-[color:var(--bg-body)] relative overflow-hidden order-1">
         <div className="flex-1 flex flex-col overflow-y-auto bg-[color:var(--bg-body)]">
           {currentApp === 'demo' ? (
-            demo.id === 'gtm' ? (
+            demo.url ? (
+              <div className="flex-1 bg-[color:var(--bg-body)] relative">
+                {iframeLoading && (
+                  <div className={isSidebarVisible ? "hidden lg:block" : ""}>
+                    <Loading />
+                  </div>
+                )}
+                <iframe
+                  src={demo.url}
+                  title={demo.title}
+                  className="w-full h-full border-0"
+                  allow="clipboard-read; clipboard-write; fullscreen"
+                  allowFullScreen
+                  onLoad={() => setIframeLoading(false)}
+                />
+              </div>
+            ) : demo.id === 'gtm' ? (
               <div className="flex-1 bg-[color:var(--bg-body)] relative">
                 {iframeLoading && (
                   <div className={isSidebarVisible ? "hidden lg:block" : ""}>

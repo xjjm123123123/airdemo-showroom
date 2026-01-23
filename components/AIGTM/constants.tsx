@@ -152,5 +152,25 @@ export const ENRICHMENT_TOOLS: EnrichmentTool[] = [
     cost: 8,
     link: 'https://ruirui.airdemo.cn/',
     categories: ['签约']
+  },
+  {
+    id: 'e6',
+    name: '建联小助手',
+    description: '通过结构化搜索客户的高管、股东、上下游信息，与飞书内部资源碰撞后，形成建联策略推荐，输出标准化的《深度建联情报与资源匹配报告》。',
+    provider: '易建联小助手',
+    icon: '/images/connection-assistant.jpeg',
+    cost: 5,
+    link: '#',
+    categories: ['获客', '商机']
+  },
+  {
+    id: 'e7',
+    name: 'gtm小助手',
+    description: '辅助 GTM 流程的智能助手',
+    provider: 'GTM 智能助手',
+    icon: '🚀',
+    cost: 5,
+    link: '#',
+    categories: ['获客', '商机']
   }
 ];

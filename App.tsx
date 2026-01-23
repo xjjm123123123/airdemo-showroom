@@ -309,7 +309,10 @@ const App: React.FC = () => {
           <Efficiency />
         ) : selectedDemo ? (
           (demoViewMode === 'flow') ? (
-            <DemoFlow demo={selectedDemo} onEnterApp={() => setDemoViewMode('workspace')} />
+            <DemoFlow 
+              demo={selectedDemo} 
+              onEnterApp={() => setDemoViewMode('workspace')} 
+            />
           ) : selectedDemo.id === 'gtm' ? (
             <AIGTMView />
           ) : (
@@ -396,10 +399,8 @@ const App: React.FC = () => {
                         className="ui-card group overflow-hidden text-left relative hover:shadow-[var(--shadow-lg)] transition-all duration-500 border-0 bg-[color:var(--bg-surface-1)] h-[280px] sm:h-[320px] flex flex-col rounded-[var(--radius-xl)] cursor-pointer"
                       >
                         <div className="absolute inset-0 z-0">
-                           {demo.id === 'inspection' ? (
-                            <img src={INSPECTION_COVER_URL} alt="" className="absolute inset-0 !w-full !h-full !max-w-none object-cover object-top transition-transform duration-700 group-hover:scale-105 block" loading="lazy" />
-                          ) : demo.id === 'gtm' ? (
-                            <img src={GTM_COVER_URL} alt="" className="absolute inset-0 !w-full !h-full !max-w-none object-cover object-top transition-transform duration-700 group-hover:scale-105 block" loading="lazy" />
+                           {demo.cover ? (
+                            <img src={demo.cover} alt="" className="absolute inset-0 !w-full !h-full !max-w-none object-cover object-top transition-transform duration-700 group-hover:scale-105 block" loading="lazy" />
                           ) : (
                             <div className="w-full h-full bg-[color:var(--bg-subtle)] flex items-center justify-center">
                               <LayoutGrid size={16} />

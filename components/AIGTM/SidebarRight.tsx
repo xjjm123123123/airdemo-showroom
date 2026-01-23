@@ -70,7 +70,7 @@ const SidebarRight: React.FC = () => {
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-lg bg-white border border-lark-border flex items-center justify-center text-xl shadow-sm overflow-hidden">
-                    {tool.icon.startsWith('http') ? (
+                    {tool.icon.startsWith('http') || tool.icon.startsWith('/') ? (
                       <img src={tool.icon} alt={tool.name} className="w-full h-full object-cover" />
                     ) : (
                       tool.icon
