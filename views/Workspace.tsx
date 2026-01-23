@@ -50,8 +50,25 @@ interface ColumnDef {
 const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) => {
   const [isAiRunning, setIsAiRunning] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
+  const [iframeError, setIframeError] = useState(false);
   const [expandedStages, setExpandedStages] = useState<Record<string, boolean>>({});
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+
+  useEffect(() => {
+    if (demo.url && currentApp === 'demo') {
+      setIframeLoading(true);
+      setIframeError(false);
+      
+      const timeout = setTimeout(() => {
+        if (iframeLoading) {
+          setIframeError(true);
+          setIframeLoading(false);
+        }
+      }, 5000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [demo.url, currentApp]);
 
   const baseIframeUrl = 'https://bytedance.larkoffice.com/base/Rcbrbk2qCazsPTs48TecJSIKnod?from=from_copylink';
   const baseAppIframeUrl = 'https://bytedance.larkoffice.com/app/Vv6DbpDoGawcMwszp3XcMms6nTf';
@@ -633,19 +650,47 @@ const Workspace: React.FC<WorkspaceProps> = ({ demo, currentApp, initialView }) 
           {currentApp === 'demo' ? (
             demo.url ? (
               <div className="flex-1 bg-[color:var(--bg-body)] relative">
-                {iframeLoading && (
-                  <div className={isSidebarVisible ? "hidden lg:block" : ""}>
-                    <Loading />
+                {iframeError ? (
+                  <div className="flex-1 flex flex-col items-center justify-center p-8">
+                    <div className="text-center max-w-md">
+                      <div className="w-16 h-16 rounded-full bg-[color:var(--bg-surface-2)] flex items-center justify-center mx-auto mb-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[color:var(--text-3)]">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="8" x2="12" y2="12"></line>
+                          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold text-[color:var(--text)] mb-2">无法在页面中加载</h3>
+                      <p className="text-sm text-[color:var(--text-2)] mb-6">该外部链接设置了安全策略，不允许在页面中嵌入。</p>
+                      <a
+                        href={demo.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ui-btn ui-btn-primary h-10 px-6 text-sm inline-flex items-center gap-2"
+                      >
+                        在新标签页中打开
+                        <ArrowUpRight size={14} />
+                      </a>
+                    </div>
                   </div>
+                ) : (
+                  <>
+                    {iframeLoading && (
+                      <div className={isSidebarVisible ? "hidden lg:block" : ""}>
+                        <Loading />
+                      </div>
+                    )}
+                    <iframe
+                      src={demo.url}
+                      title={demo.title}
+                      className="w-full h-full border-0"
+                      allow="clipboard-read; clipboard-write; fullscreen"
+                      allowFullScreen
+                      onLoad={() => setIframeLoading(false)}
+                      onError={() => setIframeError(true)}
+                    />
+                  </>
                 )}
-                <iframe
-                  src={demo.url}
-                  title={demo.title}
-                  className="w-full h-full border-0"
-                  allow="clipboard-read; clipboard-write; fullscreen"
-                  allowFullScreen
-                  onLoad={() => setIframeLoading(false)}
-                />
               </div>
             ) : demo.id === 'gtm' ? (
               <div className="flex-1 bg-[color:var(--bg-body)] relative">
