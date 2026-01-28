@@ -37,7 +37,7 @@ type Message = {
   text: string;
 };
 
-const AI_NAVIGATOR_URL = 'https://www.ailinghangzhe.cn';
+const AI_NAVIGATOR_URL = 'http://115.190.84.234:8081';
 const AILY_CHAT_ENDPOINT = (import.meta as any).env?.VITE_AILY_CHAT_ENDPOINT || '/api/aily';
 
 const App: React.FC = () => {
