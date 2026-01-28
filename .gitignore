@@ -23,3 +23,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets and Scripts with credentials
+*secret.yaml
+*.cjs

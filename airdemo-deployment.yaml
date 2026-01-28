@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airdemo
+  namespace: dellivery
+  labels:
+    app: airdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airdemo
+  template:
+    metadata:
+      annotations:
+        vke.volcengine.com/burst-to-vci: enforce
+      labels:
+        app: airdemo
+    spec:
+      imagePullSecrets:
+      - name: cstc-registry-secret
+      containers:
+      - name: airdemo
+        image: cstc-cr-prd-cn-beijing.cr.volces.com/cstc-tools/airdemo:20260127-amd64
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
