@@ -254,7 +254,7 @@ export const DEMO_LIST: Demo[] = [
   {
     id: '3d-packing',
     title: '智能3D装箱模拟器',
-    cover: 'https://files.imagetourl.net/uploads/1766245759016-b1a82b7e-adc4-438c-84b4-d4e95790c2d1.png',
+    cover: 'https://raw.githubusercontent.com/xjjm123123123/airdemo-showroom/main/public/images/%E8%A3%85%E7%AE%B1%E5%8A%A9%E6%89%8B%E9%85%8D%E5%9B%BE.png',
     valueProp: '基于AI算法的智能装箱方案，提高装载率，降低物流成本',
     points: ['订单自动优化', '3D可视化装箱', '装载率实时计算'],
     audience: '物流经理 / 仓储主管 / 供应链负责人',
