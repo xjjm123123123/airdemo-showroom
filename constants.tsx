@@ -272,6 +272,27 @@ export const DEMO_LIST: Demo[] = [
       actions: [],
       next: ''
     }
+  },
+  {
+    id: 'chain-manual-assistant',
+    title: '东华链条手册识别助手',
+    cover: '/images/东华链条手册识别助手.png',
+    valueProp: '快速、准确地检索手册知识，替代传统的人工翻阅方式，提升知识获取效率',
+    points: ['RAG 检索增强', 'OCR 图文解析', '一站式知识获取'],
+    audience: '工程师 / 技术人员 / 售后支持',
+    url: 'https://aily.feishu.cn/agents/agent_4j1r5erkzump4',
+    steps: [
+      { id: 1, title: '自然语言提问', component: 'Aily', script: '工程师通过 Aily 机器人输入《链传动设计与技术手册》相关的自然语言问题（如：链传动安装相关参考）', value: '自然语言交互，降低门槛', fallback: '' },
+      { id: 2, title: 'AI 智能解析', component: 'RAG & OCR', script: '系统利用 RAG（检索增强生成）和 OCR 能力，自动解析手册中的图文内容，识别关键信息（如产品参数、操作步骤、注意事项），并进行向量化处理。', value: '多模态解析，精准识别', fallback: '' },
+      { id: 3, title: '一站式获取', component: '知识库', script: '根据检索结果，系统可自动关联《链传动设计与技术手册》并为工程师提供一站式知识获取服务。', value: '快速定位，提升效率', fallback: '' }
+    ],
+    mainTable: [],
+    aiInsights: {
+      conclusion: '',
+      risks: [],
+      actions: [],
+      next: ''
+    }
   }
 ];
 
