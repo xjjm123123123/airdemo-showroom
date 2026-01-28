@@ -293,6 +293,27 @@ export const DEMO_LIST: Demo[] = [
       actions: [],
       next: ''
     }
+  },
+  {
+    id: 'gaodun-exam-assistant',
+    title: '高顿教育出题助手',
+    cover: '/images/高顿出题例图.png',
+    valueProp: '围绕CFA/FRM教材考纲，模仿课后题风格自动出题，提升教研效率',
+    points: ['考纲精准匹配', '课后题风格模仿', '自动解析生成'],
+    audience: '教研人员 / 培训讲师 / 课程设计师',
+    url: 'https://applink.larkoffice.com/T93iPXoRDrkT',
+    steps: [
+      { id: 1, title: '出题指令输入', component: 'Aily', script: '教研人员通过出题机器人输入指令，例如 “请围绕 CFA 教材 Module 3 的考纲，模仿课后题风格生成一个案例及 4 道选择题，并提供对应解析”。', value: '指令灵活，覆盖多场景', fallback: '' },
+      { id: 2, title: 'AI 知识检索', component: 'RAG', script: '系统利用 RAG 能力，自动解析 CFA/FRM 教材的指定模块章节及对应考纲内容，识别核心知识点（如金融模型、计算方法），并进行向量化处理。', value: '知识精准定位', fallback: '' },
+      { id: 3, title: '题目自动生成', component: '生成模型', script: '根据检索结果，系统自动生成包含案例背景、4 道选择题及详细解析（含计算过程）的完整题目，最终输出符合要求的中英对照题目消息卡片。', value: '格式规范，解析详尽', fallback: '' }
+    ],
+    mainTable: [],
+    aiInsights: {
+      conclusion: '',
+      risks: [],
+      actions: [],
+      next: ''
+    }
   }
 ];
 
