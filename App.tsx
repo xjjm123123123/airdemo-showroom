@@ -27,7 +27,7 @@ import Efficiency from './views/Efficiency';
 import Prism from './components/Prism';
 import TextType from './components/TextType';
 import BottomToolbar from './components/BottomToolbar';
-import { Demo } from './types';
+import { Demo, EfficiencyTool } from './types';
 
 type AppId = 'home' | 'demo' | 'efficiency';
 type WorkspaceViewId = 'main' | 'management' | 'equipment' | 'factory';
@@ -37,8 +37,39 @@ type Message = {
   text: string;
 };
 
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || '/api';
 const AI_NAVIGATOR_URL = 'http://115.190.84.234:8081';
 const AILY_CHAT_ENDPOINT = (import.meta as any).env?.VITE_AILY_CHAT_ENDPOINT || '/api/aily';
+
+const fetchDemos = async (): Promise<Demo[]> => {
+  try {
+    const resp = await fetch(`${API_BASE}/demo`);
+    if (!resp.ok) throw new Error('Failed to fetch demos');
+    const json = await resp.json();
+    if (json.code === 0 && json.data) {
+      return json.data;
+    }
+    return [];
+  } catch (error) {
+    console.warn('从 API 加载 Demo 失败，使用静态数据:', error);
+    return [];
+  }
+};
+
+const fetchTools = async (): Promise<EfficiencyTool[]> => {
+  try {
+    const resp = await fetch(`${API_BASE}/tools`);
+    if (!resp.ok) throw new Error('Failed to fetch tools');
+    const json = await resp.json();
+    if (json.code === 0 && json.data) {
+      return json.data;
+    }
+    return [];
+  } catch (error) {
+    console.warn('从 API 加载工具失败，使用静态数据:', error);
+    return [];
+  }
+};
 
 const App: React.FC = () => {
   const [selectedDemo, setSelectedDemo] = useState<Demo | null>(null);
@@ -50,6 +81,34 @@ const App: React.FC = () => {
   const [isHomeChatCollapsed, setIsHomeChatCollapsed] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHomeChatLoading, setIsHomeChatLoading] = useState(false);
+  const [demoList, setDemoList] = useState<Demo[]>([...DEMO_LIST]);
+  const [efficiencyTools, setEfficiencyTools] = useState<EfficiencyTool[]>([...EFFICIENCY_TOOLS]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [demos, tools] = await Promise.all([fetchDemos(), fetchTools()]);
+
+        if (demos.length > 0) {
+          setDemoList(demos);
+        } else {
+          setDemoList([...DEMO_LIST]);
+        }
+
+        if (tools.length > 0) {
+          setEfficiencyTools(tools);
+        } else {
+          setEfficiencyTools([...EFFICIENCY_TOOLS]);
+        }
+      } catch (error) {
+        console.warn('加载数据失败，使用静态数据:', error);
+        setDemoList([...DEMO_LIST]);
+        setEfficiencyTools([...EFFICIENCY_TOOLS]);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleGoHome = () => {
     setSelectedDemo(null);
@@ -134,7 +193,7 @@ const App: React.FC = () => {
 
   const handleToolbarNavigate = (id: string) => {
     if (id === 'inspection') {
-      const demo = DEMO_LIST.find(d => d.id === 'inspection');
+      const demo = demoList.find(d => d.id === 'inspection');
       if (demo) {
         setSelectedDemo(demo);
         setCurrentApp('demo');
@@ -142,7 +201,7 @@ const App: React.FC = () => {
       }
     } else if (id === 'tantan') {
       // 映射到 GTM Demo (包含探探)
-      const demo = DEMO_LIST.find(d => d.id === 'gtm');
+      const demo = demoList.find(d => d.id === 'gtm');
       if (demo) {
         setSelectedDemo(demo);
         setCurrentApp('demo');
@@ -306,7 +365,7 @@ const App: React.FC = () => {
 
       <main className={`absolute top-14 bottom-0 left-0 right-0 flex flex-col lg:flex-row overflow-hidden z-10 ${isLightMode ? 'light-theme' : ''}`}>
         {currentApp === 'efficiency' ? (
-          <Efficiency />
+          <Efficiency tools={efficiencyTools} />
         ) : selectedDemo ? (
           (demoViewMode === 'flow') ? (
             <DemoFlow 
@@ -383,7 +442,7 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-                    {DEMO_LIST.map((demo) => (
+                    {demoList.map((demo) => (
                       <div
                         key={demo.id}
                         role="button"
@@ -456,7 +515,7 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-                    {EFFICIENCY_TOOLS.map((tool) => (
+                    {efficiencyTools.map((tool) => (
                       <div key={tool.id} className="ui-card overflow-hidden p-4 sm:p-5 lg:p-6 hover:border-[color:var(--border-strong)] hover:bg-[color:var(--bg-surface-2)] transition-all duration-300 group flex flex-col h-full items-start sm:items-center text-left sm:text-center rounded-[var(--radius-xl)]">
                         <div className="flex flex-row sm:flex-col items-center gap-3 sm:gap-4 mb-3 sm:mb-4 w-full">
                           <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[var(--radius-md)] bg-[color:var(--bg-surface-2)] border border-[color:var(--border)] flex items-center justify-center overflow-hidden flex-shrink-0">

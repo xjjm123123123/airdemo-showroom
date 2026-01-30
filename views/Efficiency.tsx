@@ -1,9 +1,7 @@
 import React from 'react';
 import { Zap, FileText, PlayCircle } from 'lucide-react';
 import Prism from '../components/Prism';
-import { EFFICIENCY_TOOLS } from '../constants';
-
-type EfficiencyTool = (typeof EFFICIENCY_TOOLS)[number];
+import { EfficiencyTool } from '../types';
 
 const ToolAvatar: React.FC<{ tool: EfficiencyTool }> = ({ tool }) => {
   if (tool.avatarUrl) {
@@ -20,7 +18,7 @@ const ToolAvatar: React.FC<{ tool: EfficiencyTool }> = ({ tool }) => {
   return <Zap size={16} />;
 };
 
-const Efficiency: React.FC = () => {
+const Efficiency: React.FC<{ tools: EfficiencyTool[] }> = ({ tools }) => {
   return (
     <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto overflow-x-hidden no-scrollbar bg-transparent animate-fadeIn relative h-full">
       <div className="absolute inset-0 pointer-events-none z-0 opacity-40">
@@ -43,7 +41,7 @@ const Efficiency: React.FC = () => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-          {EFFICIENCY_TOOLS.map((tool) => (
+          {tools.map((tool) => (
             <div key={tool.id} className="ui-card flex flex-col h-full p-5 sm:p-6 hover:border-[color:var(--border-strong)] hover:bg-[color:var(--bg-surface-2)] transition-all duration-300 group rounded-2xl shadow-sm">
               <div className="flex items-start justify-between gap-4 mb-5 min-w-0">
                 <div className="flex items-start gap-4 min-w-0">

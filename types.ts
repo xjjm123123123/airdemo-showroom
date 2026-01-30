@@ -68,9 +68,11 @@ export interface EfficiencyTool {
   name: string;
   title: string;
   url: string;
-  skills: string[];
+  skills: string[] | readonly string[];
   highlight: string;
   avatarUrl?: string;
+  docUrl?: string;
+  videoUrl?: string;
 }
 
 export interface AgentProfile {
